@@ -1,0 +1,806 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Linux进程的地址空间有什么工具可以来查看进程的地址空间  pmap cat &#x2F;proc&#x2F; [pid] &#x2F; maps gdb readelf objdump  有的程序刚开始执行就结束了(比如打印一个东西就退出)，如果要查看这个进程的地址空间。那怎么办？  使用gdb。使用gdb命令 info inferiors得到进程的pid   该命令打印gdb当前管理的inf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="应用视角的操作系统">
+<meta property="og:url" content="http://example.com/2023/08/02/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="Linux进程的地址空间有什么工具可以来查看进程的地址空间  pmap cat &#x2F;proc&#x2F; [pid] &#x2F; maps gdb readelf objdump  有的程序刚开始执行就结束了(比如打印一个东西就退出)，如果要查看这个进程的地址空间。那怎么办？  使用gdb。使用gdb命令 info inferiors得到进程的pid   该命令打印gdb当前管理的inf">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-02T15:36:41.925Z">
+<meta property="article:modified_time" content="2023-08-02T15:42:00.395Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="jyy操作系统">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>应用视角的操作系统 - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="应用视角的操作系统"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-02 23:36" pubdate>
+          2023年8月2日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          92 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">应用视角的操作系统</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Linux进程的地址空间"><a href="#Linux进程的地址空间" class="headerlink" title="Linux进程的地址空间"></a>Linux进程的地址空间</h2><p>有什么工具可以来查看进程的地址空间</p>
+<ol>
+<li>pmap</li>
+<li>cat &#x2F;proc&#x2F; [pid] &#x2F; maps</li>
+<li>gdb</li>
+<li>readelf</li>
+<li>objdump</li>
+</ol>
+<p>有的程序刚开始执行就结束了(比如打印一个东西就退出)，如果要查看这个进程的地址空间。那怎么办？</p>
+<blockquote>
+<p>使用gdb。<br>使用gdb命令 info inferiors得到进程的pid</p>
+</blockquote>
+<ul>
+<li>该命令打印gdb当前管理的inferiors列表，每个inferior都有自己的不同地址空间，inferior与进程对应。</li>
+</ul>
+<ol>
+<li><p>得到进程的pid后,使用命令 !pmap [pid], 在gdb中使用shell命令需要在前面加上 ！。</p>
+</li>
+<li><p>同样，在gdb中，还可以使用 !cat &#x2F;proc&#x2F; [pid] &#x2F;maps来查看进程的地址空间。</p>
+</li>
+</ol>
+<ul>
+<li>其实pmap就是使用系统中的 &#x2F;proc&#x2F;[pid]&#x2F;这个文件实现的。<br>怎么证明呢？<blockquote>
+<p>使用 strace   strace pmap [pid]</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Hello World\n&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h4><p>gdb调试starti之后，查看进程的地址空间：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">0000555555554000</span>      <span class="hljs-number">4</span>K r---- a.out<br><span class="hljs-attribute">0000555555555000</span>      <span class="hljs-number">4</span>K r-x-- a.out<br><span class="hljs-attribute">0000555555556000</span>      <span class="hljs-number">4</span>K r---- a.out<br><span class="hljs-attribute">0000555555557000</span>      <span class="hljs-number">8</span>K rw--- a.out<br><span class="hljs-attribute">00007ffff7fbd000</span>     <span class="hljs-number">16</span>K r----  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fc1000</span>      <span class="hljs-number">8</span>K r-x--  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fc3000</span>      <span class="hljs-number">8</span>K r---- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7fc5000</span>    <span class="hljs-number">168</span>K r-x-- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7fef000</span>     <span class="hljs-number">44</span>K r---- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7ffb000</span>     <span class="hljs-number">16</span>K rw--- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffffffdd000</span>    <span class="hljs-number">136</span>K rw---  <span class="hljs-meta"> [ stack ]</span><br> <span class="hljs-attribute">total</span>              <span class="hljs-number">416</span>K<br></code></pre></td></tr></table></figure>
+<p>我们还发现，在按下starti后，有一条信息：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-number">0</span>x00007ffff7fe32b0 in _start () <span class="hljs-keyword">from</span> <span class="hljs-regexp">/lib64/</span>ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+<p>说明动态链接的第一条指令在&#x2F;lib64&#x2F;ld-linux-x86-64.so.2中，甚至在地址空间中此时也没有libc这个库。<br>在状态机在刚刚被初始化的一瞬间，在进程里面还没有printf。</p>
+<blockquote>
+<p>动态链接的ELF文件中，有一个INTERP, 就是这里的ld-linux-x86-64.so.2, 需要另外一个程序，才能执行现在这个程序，对于动态链接来说，这就是加载器。</p>
+</blockquote>
+<p>再在main函数上打个断点，continue后再打印一次进程的地址空间</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">0000555555554000</span>      <span class="hljs-number">4</span>K r---- a.out<br><span class="hljs-attribute">0000555555555000</span>      <span class="hljs-number">4</span>K r-x-- a.out<br><span class="hljs-attribute">0000555555556000</span>      <span class="hljs-number">4</span>K r---- a.out<br><span class="hljs-attribute">0000555555557000</span>      <span class="hljs-number">4</span>K r---- a.out<br><span class="hljs-attribute">0000555555558000</span>      <span class="hljs-number">4</span>K rw--- a.out<br><span class="hljs-attribute">00007ffff7d7f000</span>     <span class="hljs-number">12</span>K rw---  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7d82000</span>    <span class="hljs-number">160</span>K r---- libc.so.<span class="hljs-number">6</span><br><span class="hljs-attribute">00007ffff7daa000</span>   <span class="hljs-number">1620</span>K r-x-- libc.so.<span class="hljs-number">6</span><br><span class="hljs-attribute">00007ffff7f3f000</span>    <span class="hljs-number">352</span>K r---- libc.so.<span class="hljs-number">6</span><br><span class="hljs-attribute">00007ffff7f97000</span>     <span class="hljs-number">16</span>K r---- libc.so.<span class="hljs-number">6</span><br><span class="hljs-attribute">00007ffff7f9b000</span>      <span class="hljs-number">8</span>K rw--- libc.so.<span class="hljs-number">6</span><br><span class="hljs-attribute">00007ffff7f9d000</span>     <span class="hljs-number">52</span>K rw---  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fbb000</span>      <span class="hljs-number">8</span>K rw---  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fbd000</span>     <span class="hljs-number">16</span>K r----  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fc1000</span>      <span class="hljs-number">8</span>K r-x--  <span class="hljs-meta"> [ anon ]</span><br><span class="hljs-attribute">00007ffff7fc3000</span>      <span class="hljs-number">8</span>K r---- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7fc5000</span>    <span class="hljs-number">168</span>K r-x-- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7fef000</span>     <span class="hljs-number">44</span>K r---- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7ffb000</span>      <span class="hljs-number">8</span>K r---- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffff7ffd000</span>      <span class="hljs-number">8</span>K rw--- ld-linux-x86-<span class="hljs-number">64</span>.so.<span class="hljs-number">2</span><br><span class="hljs-attribute">00007ffffffdd000</span>    <span class="hljs-number">136</span>K rw---  <span class="hljs-meta"> [ stack ]</span><br> <span class="hljs-attribute">total</span>             <span class="hljs-number">2644</span>K<br></code></pre></td></tr></table></figure>
+<p>如上，我们发现libc已经有了。加载器也还在，未来可能还需要这个加载器加载其他动态链接库。</p>
+<h4 id="其他小细节"><a href="#其他小细节" class="headerlink" title="其他小细节"></a>其他小细节</h4><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">int</span> main&#123;<br>	<span class="hljs-built_in">time</span>(<span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在库都加载完成后，用 !cat &#x2F;proc&#x2F;14776&#x2F;&#x2F;maps 查看该进程的地址空间</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">7ffff7fbd000</span>-<span class="hljs-number">7</span>ffff7fc1000 r--p <span class="hljs-number">00000000</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span> <span class="hljs-number">0</span>                         <span class="hljs-meta"> [vvar]</span><br><br><span class="hljs-attribute">7ffff7fc1000</span>-<span class="hljs-number">7</span>ffff7fc3000 r-xp <span class="hljs-number">00000000</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span> <span class="hljs-number">0</span>                         <span class="hljs-meta"> [vdso]</span><br><br></code></pre></td></tr></table></figure>
+<p>我们发现这两行， vvar 和 vdso 是什么？</p>
+<blockquote>
+<p>不进入内核的系统调用。<br>vvar is a memory region that contains kernel variables that are frequently accessed by user-space programs. These variables are read-only and can be accessed directly by the user-space programs without making a system call.<br>例如<br>当前的时间， 系统页面大小<br>vdso is a memory region that contains a small shared library provided by the kernel. This library contains a set of functions that are commonly used by user-space programs and can be excuted directly in user mode, without the need for a system call.</p>
+</blockquote>
+<h3 id="进程地址空间的管理"><a href="#进程地址空间的管理" class="headerlink" title="进程地址空间的管理"></a>进程地址空间的管理</h3><p>操作系统应该提供一个修改进程地址空间的系统调用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 映射</span><br><span class="hljs-type">void</span> *<span class="hljs-title function_">mmap</span><span class="hljs-params">(<span class="hljs-type">void</span> *addr, <span class="hljs-type">size_t</span> length, <span class="hljs-type">int</span> prot, <span class="hljs-type">int</span> flags,</span><br><span class="hljs-params">           <span class="hljs-type">int</span> fd, <span class="hljs-type">off_t</span> offset)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">munmap</span><span class="hljs-params">(<span class="hljs-type">void</span> *addr, <span class="hljs-type">size_t</span> length)</span>;<br><br><span class="hljs-comment">// 修改映射权限</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">mprotect</span><span class="hljs-params">(<span class="hljs-type">void</span> *addr, <span class="hljs-type">size_t</span> length, <span class="hljs-type">int</span> prot)</span>;<br></code></pre></td></tr></table></figure>
+
+<p>本质：在状态机状态上增加&#x2F;删除&#x2F;修改一段可访问的内存</p>
+<ul>
+<li>mmap: 可以用来申请内存 (MAP_ANONYMOUS)，也可以把文件 “搬到” 进程地址空间中</li>
+</ul>
+<p>一小段示例代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/mman.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> GiB * (1024LL * 1024 * 1024)</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">volatile</span> <span class="hljs-type">uint8_t</span> *p = mmap(<span class="hljs-literal">NULL</span>, <span class="hljs-number">8</span> GiB, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;mmap: %lx\n&quot;</span>, (<span class="hljs-type">uintptr_t</span>)p);<br>  <span class="hljs-keyword">if</span> ((<span class="hljs-type">intptr_t</span>)p == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;cannot map&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);<br>  &#125;<br>  *(p + <span class="hljs-number">2</span> GiB) = <span class="hljs-number">1</span>;<br>  *(p + <span class="hljs-number">4</span> GiB) = <span class="hljs-number">2</span>;<br>  *(p + <span class="hljs-number">7</span> GiB) = <span class="hljs-number">3</span>;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Read get: %d\n&quot;</span>, *(p + <span class="hljs-number">4</span> GiB));<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Read get: %d\n&quot;</span>, *(p + <span class="hljs-number">6</span> GiB));<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Read get: %d\n&quot;</span>, *(p + <span class="hljs-number">7</span> GiB));<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>疑问：这个程序运行会不会需要很长的时间，因为它分配了那么多的内存？</p>
+<blockquote>
+<p>其实一瞬间就完成了。也就是说，在使用mmap的时候，只是在操作系统中标记了这个进程这么多的内存，这个进程中这些内存还并没有开始分配，只是在后面用到了才会产生缺页中断。</p>
+</blockquote>
+<h3 id="入侵地址空间"><a href="#入侵地址空间" class="headerlink" title="入侵地址空间"></a>入侵地址空间</h3><p>进程 (M,  R 状态机) 在 “无情执行指令机器” 上执行</p>
+<ul>
+<li>状态机是一个封闭世界</li>
+<li>但如果允许一个进程对其他进程的地址空间有访问权？</li>
+</ul>
+<p>一些入侵地址空间的例子</p>
+<ol>
+<li>调试器(gdb)</li>
+</ol>
+<ul>
+<li>gdb 可以任意观测和修改程序的状态</li>
+</ul>
+<ol start="2">
+<li>Profiler (perf)</li>
+</ol>
+<h4 id="入侵进程地址空间-1-金山游侠"><a href="#入侵进程地址空间-1-金山游侠" class="headerlink" title="入侵进程地址空间 (1): 金山游侠"></a>入侵进程地址空间 (1): 金山游侠</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;assert.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdbool.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdarg.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_WATCH 65536</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">game</span> &#123;</span><br>  <span class="hljs-type">const</span> <span class="hljs-type">char</span> *name;  <span class="hljs-comment">// Name of the binary</span><br>  <span class="hljs-type">int</span> pid;           <span class="hljs-comment">// Process ID</span><br><br>  <span class="hljs-type">int</span> memfd;         <span class="hljs-comment">// Address space of the process</span><br>  <span class="hljs-type">int</span> bits;          <span class="hljs-comment">// Search bit-width (16, 32, or 64)</span><br>  <span class="hljs-type">bool</span> has_watch;    <span class="hljs-comment">// Watched values</span><br>  <span class="hljs-type">uintptr_t</span> watch[MAX_WATCH];<br>&#125;;<br><br>FILE* <span class="hljs-title function_">popens</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* fmt, ...)</span>;<br><span class="hljs-type">uint64_t</span> <span class="hljs-title function_">mem_load</span><span class="hljs-params">(<span class="hljs-type">char</span> *mem, <span class="hljs-type">int</span> off, <span class="hljs-type">int</span> bits)</span>;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">scan</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> game *g, <span class="hljs-type">uint32_t</span> val)</span> &#123;<br>  <span class="hljs-type">uintptr_t</span> start, kb;<br>  <span class="hljs-type">char</span> perm[<span class="hljs-number">16</span>];<br>  FILE *fp = popens(<span class="hljs-string">&quot;pmap -x $(pidof %s) | tail -n +3&quot;</span>, g-&gt;name);<br>  <span class="hljs-type">int</span> nmatch = <span class="hljs-number">0</span>;<br><br>  <span class="hljs-keyword">while</span> (<span class="hljs-built_in">fscanf</span>(fp, <span class="hljs-string">&quot;%lx&quot;</span>, &amp;start) == <span class="hljs-number">1</span>) &#123;<br>    <span class="hljs-built_in">fscanf</span>(fp, <span class="hljs-string">&quot;%ld%*ld%*ld%s%*[^\n]s&quot;</span>, &amp;kb, perm);<br>    <span class="hljs-keyword">if</span> (perm[<span class="hljs-number">1</span>] != <span class="hljs-string">&#x27;w&#x27;</span>) <span class="hljs-keyword">continue</span>;  <span class="hljs-comment">// Non-writable areas</span><br><br>    <span class="hljs-type">uintptr_t</span> size = kb * <span class="hljs-number">1024</span>;<br>    <span class="hljs-type">char</span> *mem = <span class="hljs-built_in">calloc</span>(size + <span class="hljs-number">16</span>, <span class="hljs-number">1</span>);  <span class="hljs-comment">// Ignores error handling for brevity</span><br>    lseek(g-&gt;memfd, start, SEEK_SET);  <span class="hljs-comment">// Don&#x27;t do this in production!</span><br>    size = read(g-&gt;memfd, mem, size);<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Scanning %lx--%lx\n&quot;</span>, start, start + size);<br><br>    <span class="hljs-keyword">if</span> (!g-&gt;has_watch) &#123;<br>      <span class="hljs-comment">// First-time search; scan all memory</span><br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> off = <span class="hljs-number">0</span>; off &lt; size; off += <span class="hljs-number">2</span>) &#123;<br>        <span class="hljs-type">uint64_t</span> v = mem_load(mem, off, g-&gt;bits);<br>        <span class="hljs-keyword">if</span> (v == val &amp;&amp; nmatch &lt; MAX_WATCH) &#123;<br>          g-&gt;watch[nmatch++] = start + off;<br>        &#125;<br>      &#125;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// Search in the watched values</span><br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; MAX_WATCH; i++) &#123;<br>        <span class="hljs-type">intptr_t</span> off = g-&gt;watch[i] - start;<br>        <span class="hljs-keyword">if</span> (g-&gt;watch[i] &amp;&amp; <span class="hljs-number">0</span> &lt;= off &amp;&amp; off &lt; size) &#123;<br>          <span class="hljs-type">uint64_t</span> v = mem_load(mem, off, g-&gt;bits);<br>          <span class="hljs-keyword">if</span> (v == val) nmatch++;<br>          <span class="hljs-keyword">else</span> g-&gt;watch[i] = <span class="hljs-number">0</span>;<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-built_in">free</span>(mem);<br>  &#125;<br>  pclose(fp);<br><br>  <span class="hljs-keyword">if</span> (nmatch &gt; <span class="hljs-number">0</span>) &#123;<br>    g-&gt;has_watch = <span class="hljs-literal">true</span>;<br>  &#125;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;There are %d match(es).\n&quot;</span>, nmatch);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">overwrite</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> game *g, <span class="hljs-type">uint64_t</span> val)</span> &#123;<br>  <span class="hljs-type">int</span> nwrite = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; MAX_WATCH; i++)<br>    <span class="hljs-keyword">if</span> (g-&gt;watch[i]) &#123;<br>      lseek(g-&gt;memfd, g-&gt;watch[i], SEEK_SET);<br>      write(g-&gt;memfd, &amp;val, g-&gt;bits / <span class="hljs-number">8</span>);<br>      nwrite++;<br>    &#125;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d value(s) written.\n&quot;</span>, nwrite);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">reset</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> game *g)</span> &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; MAX_WATCH; i++) &#123;<br>    g-&gt;watch[i] = <span class="hljs-number">0</span>;<br>  &#125;<br>  g-&gt;has_watch = <span class="hljs-literal">false</span>;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Search for %d-bit values in %s.\n&quot;</span>, g-&gt;bits, g-&gt;name);<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">load_game</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> game *g, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *name)</span> &#123;<br>  FILE *pid_fp;<br>  <span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>;<br><br>  g-&gt;name = name;<br>  g-&gt;bits = <span class="hljs-number">32</span>;<br>  reset(g);<br><br>  pid_fp = popens(<span class="hljs-string">&quot;pidof %s&quot;</span>, g-&gt;name);<br>  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">fscanf</span>(pid_fp, <span class="hljs-string">&quot;%d&quot;</span>, &amp;g-&gt;pid) != <span class="hljs-number">1</span>) &#123;<br>    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;Panic: fail to get pid of \&quot;%s\&quot;.\n&quot;</span>, g-&gt;name);<br>    ret = <span class="hljs-number">-1</span>;<br>    <span class="hljs-keyword">goto</span> release;<br>  &#125;<br><br>  <span class="hljs-type">char</span> buf[<span class="hljs-number">64</span>];<br>  <span class="hljs-built_in">snprintf</span>(buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-string">&quot;/proc/%d/mem&quot;</span>, g-&gt;pid);<br>  g-&gt;memfd = open(buf, O_RDWR);<br>  <span class="hljs-keyword">if</span> (g-&gt;memfd &lt; <span class="hljs-number">0</span>) &#123;<br>    perror(<span class="hljs-string">&quot;/proc/[pid]/mem&quot;</span>);<br>    ret = <span class="hljs-number">-1</span>;<br>    <span class="hljs-keyword">goto</span> release;<br>  &#125;<br><br>release:<br>  <span class="hljs-keyword">if</span> (pid_fp) pclose(pid_fp);<br>  <span class="hljs-keyword">return</span> ret;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">close_game</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> game *g)</span> &#123;<br>  <span class="hljs-keyword">if</span> (g-&gt;memfd &gt;= <span class="hljs-number">0</span>) &#123;<br>    close(g-&gt;memfd);<br>  &#125;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> *argv[])</span> &#123;<br>  <span class="hljs-type">long</span> val;<br>  <span class="hljs-type">char</span> buf[<span class="hljs-number">64</span>];<br>  <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">game</span> <span class="hljs-title">game</span>;</span><br><br>  <span class="hljs-keyword">if</span> (load_game(&amp;game, argv[<span class="hljs-number">1</span>]) &lt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-keyword">goto</span> release;<br>  &#125;<br><br>  <span class="hljs-keyword">while</span> (!feof(<span class="hljs-built_in">stdin</span>)) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;(%s %d) &quot;</span>, game.name, game.pid);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%s&quot;</span>, buf) &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">goto</span> release;<br><br>    <span class="hljs-keyword">switch</span> (buf[<span class="hljs-number">0</span>]) &#123;<br>      <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;q&#x27;</span>: <span class="hljs-keyword">goto</span> release; <span class="hljs-keyword">break</span>;<br>      <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;b&#x27;</span>: <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%ld&quot;</span>, &amp;val); game.bits = val; reset(&amp;game); <span class="hljs-keyword">break</span>;<br>      <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;s&#x27;</span>: <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%ld&quot;</span>, &amp;val); scan(&amp;game, val); <span class="hljs-keyword">break</span>;<br>      <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;w&#x27;</span>: <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%ld&quot;</span>, &amp;val); overwrite(&amp;game, val); <span class="hljs-keyword">break</span>;<br>      <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;r&#x27;</span>: reset(&amp;game); <span class="hljs-keyword">break</span>;<br>    &#125;<br>  &#125;<br><br>release:<br>  close_game(&amp;game);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br>FILE* <span class="hljs-title function_">popens</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* fmt, ...)</span> &#123;<br>  <span class="hljs-type">char</span> cmd[<span class="hljs-number">128</span>];<br>  va_list args;<br>  va_start(args, fmt);<br>  vsnprintf(cmd, <span class="hljs-keyword">sizeof</span>(cmd), fmt, args);<br>  va_end(args);<br>  FILE *ret = popen(cmd, <span class="hljs-string">&quot;r&quot;</span>);<br>  assert(ret);<br>  <span class="hljs-keyword">return</span> ret;<br>&#125;<br><br><span class="hljs-type">uint64_t</span> <span class="hljs-title function_">mem_load</span><span class="hljs-params">(<span class="hljs-type">char</span> *mem, <span class="hljs-type">int</span> off, <span class="hljs-type">int</span> bits)</span> &#123;<br>  <span class="hljs-type">uint64_t</span> val = *(<span class="hljs-type">uint64_t</span> *)(&amp;mem[off]);<br>  <span class="hljs-keyword">switch</span> (bits) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">16</span>: val &amp;= <span class="hljs-number">0xffff</span>; <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">32</span>: val &amp;= <span class="hljs-number">0xffffffff</span>; <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">64</span>: <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">default</span>: assert(<span class="hljs-number">0</span>);<br>  &#125;<br>  <span class="hljs-keyword">return</span> val;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>代码导读</p>
+<ul>
+<li>va_list，va_start()、va_arg() 和 va_end() 是什么<blockquote>
+<p>这可以使C语言实现变长参数。</p>
+<blockquote>
+<p>va_list 是一个类型，用于表示可变参数列表。<br>va_start() 宏用于初始化可变参数列表<br>va_arg() 宏用于访问可变参数列表中的下一个参数<br>va_end() 宏用于结束可变参数列表的访问</p>
+</blockquote>
+</blockquote>
+</li>
+<li>一段小例子<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdarg.h&gt;</span></span><br><br><span class="hljs-type">double</span> <span class="hljs-title function_">average</span><span class="hljs-params">(<span class="hljs-type">int</span> count, ...)</span> &#123;<br>    va_list ap;<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-type">double</span> total = <span class="hljs-number">0.0</span>;<br><br>    va_start(ap, count); <span class="hljs-comment">// 初始化可变参数列表</span><br><br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; count; i++) &#123;<br>        total += va_arg(ap, <span class="hljs-type">double</span>); <span class="hljs-comment">// 获取下一个参数</span><br>    &#125;<br><br>    va_end(ap); <span class="hljs-comment">// 结束可变参数列表</span><br><br>    <span class="hljs-keyword">return</span> total / count;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">double</span> avg = average(<span class="hljs-number">5</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">2.0</span>, <span class="hljs-number">3.0</span>, <span class="hljs-number">4.0</span>, <span class="hljs-number">5.0</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;平均值为：%f\n&quot;</span>, avg);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>popen函数</p>
+<blockquote>
+<p>popen()会调用fork()产生子进程，然后从子进程中调用&#x2F;bin&#x2F;sh -c来执行参数command的指令。参数type可使用“r”代表读取，“w”代表写入。依照此type值，popen()会建立管道连到子进程的标准输出设备或标准输入设备，然后返回一个文件指针。随后进程便可利用此文件指针来读取子进程的输出设备或是写入到子进程的标准输入设备中。</p>
+</blockquote>
+</blockquote>
+</li>
+<li>也就是说，首先获取游戏进程的名字后，先创建一个子进程执行 pidof [name]的命令，可以获取游戏进程pid。然后fscanf(pid_fp, “%d”, &amp;g-&gt;pid) !&#x3D; 1读取该进程pid。<br>接着打开&#x2F;proc&#x2F;[pid]&#x2F;mem这个文件。g-&gt;memfd指向这个文件。<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">snprintf</span>(buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-string">&quot;/proc/%d/mem&quot;</span>, g-&gt;pid);<br>  g-&gt;memfd = open(buf, O_RDWR);<br>  <span class="hljs-keyword">if</span> (g-&gt;memfd &lt; <span class="hljs-number">0</span>) &#123;<br>    perror(<span class="hljs-string">&quot;/proc/[pid]/mem&quot;</span>);<br>    ret = <span class="hljs-number">-1</span>;<br>    <span class="hljs-keyword">goto</span> release;<br>  &#125;<br><br></code></pre></td></tr></table></figure></li>
+<li>scan函数<br>在用pmap得到虚拟地址区域后，就可以把这个区域映射到入侵程序的地址空间中，并得到起始地址。<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">char</span> *mem = <span class="hljs-built_in">calloc</span>(size + <span class="hljs-number">16</span>, <span class="hljs-number">1</span>);  <span class="hljs-comment">// Ignores error handling for </span><br></code></pre></td></tr></table></figure></li>
+<li>之后把 &#x2F;proc&#x2F;pid&#x2F;mem的文件偏移设为虚拟地址区域起始处。</li>
+</ul>
+<ul>
+<li>如果想要在&#x2F;proc&#x2F;pid&#x2F;mem 文件访问进程的虚拟地址 0x12345678，您需要将文件偏移量设置为 0x12345678。<br>并把这个区域的内存全部写入入侵进程的地址空间中。<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">lseek(g-&gt;memfd, start, SEEK_SET);  <span class="hljs-comment">// Don&#x27;t do this in production!</span><br>size = read(g-&gt;memfd, mem, size);<br></code></pre></td></tr></table></figure></li>
+</ul>
+<ul>
+<li>然后就可以根据偏移，可以把相应的地址对应起来了。大致意思就是在入侵地址里暴力寻找符合条件的地址，然后根据找的的符合条件的地址，由于偏移是一样的，也就可以把这个地址对应到被入侵进程的相应虚拟地址区域中了。</li>
+</ul>
+<h4 id="入侵进程地址空间-2-变速齿轮"><a href="#入侵进程地址空间-2-变速齿轮" class="headerlink" title="入侵进程地址空间 (2): 变速齿轮"></a>入侵进程地址空间 (2): 变速齿轮</h4><p>用修改程序系统调用的手段来欺骗程序对时间的认识，就可以实现游戏的加速和减速。</p>
+<ul>
+<li><p>简单的一段C程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">int</span> hp = <span class="hljs-number">10000</span>;<br><br>__attribute__((noinline)) <span class="hljs-type">int</span> <span class="hljs-title function_">hit</span><span class="hljs-params">(<span class="hljs-type">int</span> damage)</span> &#123;<br>  <span class="hljs-keyword">return</span> hp - damage;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>    hp = hit(rand() % <span class="hljs-number">10</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;hp = %d\n&quot;</span>, hp);<br>    usleep(<span class="hljs-number">10000</span>);<br>    <span class="hljs-keyword">if</span> (hp &lt; <span class="hljs-number">0</span>) &#123;<br>      <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Game Over\n&quot;</span>);<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>python 脚本</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/env python3</span><br><br><span class="hljs-keyword">from</span> sys <span class="hljs-keyword">import</span> argv<br><span class="hljs-keyword">import</span> subprocess<br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(argv) &lt; <span class="hljs-number">2</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;Usage <span class="hljs-subst">&#123;argv[<span class="hljs-number">0</span>]&#125;</span> [--hp] [--fast] [--slow]&#x27;</span>)<br>    exit(<span class="hljs-number">1</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">patch</span>(<span class="hljs-params">addr, patch</span>):<br>    pid = <span class="hljs-built_in">int</span>(subprocess.check_output([<span class="hljs-string">&#x27;pidof&#x27;</span>, <span class="hljs-string">&#x27;game&#x27;</span>]))<br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">f&#x27;/proc/<span class="hljs-subst">&#123;pid&#125;</span>/mem&#x27;</span>, <span class="hljs-string">&#x27;wb&#x27;</span>) <span class="hljs-keyword">as</span> fp:<br>        fp.seek(addr)<br>        fp.write(patch)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">name</span>(<span class="hljs-params">symbol</span>):<br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> subprocess.check_output([<span class="hljs-string">&#x27;nm&#x27;</span>, <span class="hljs-string">&#x27;game&#x27;</span>]).splitlines():<br>        tokens = line.decode(<span class="hljs-string">&#x27;utf-8&#x27;</span>).split()<br>        <span class="hljs-keyword">if</span> tokens[-<span class="hljs-number">2</span>:] == [<span class="hljs-string">&#x27;T&#x27;</span>, symbol]:<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">int</span>(tokens[<span class="hljs-number">0</span>], base=<span class="hljs-number">16</span>)<br><br><span class="hljs-keyword">if</span> <span class="hljs-string">&#x27;--hp&#x27;</span> <span class="hljs-keyword">in</span> argv:<br>    <span class="hljs-comment"># hit -&gt; mov $9999999, %eax; ret</span><br>    patch(name(<span class="hljs-string">&#x27;hit&#x27;</span>), <span class="hljs-string">b&#x27;\xb8\x7f\x96\x98\x00\xc3&#x27;</span>)<br><br><span class="hljs-keyword">if</span> <span class="hljs-string">&#x27;--slow&#x27;</span> <span class="hljs-keyword">in</span> argv:<br>    <span class="hljs-comment"># usleep (endbr64) -&gt; shl $0x4, %rdi</span><br>    patch(name(<span class="hljs-string">&#x27;usleep&#x27;</span>), <span class="hljs-string">b&#x27;\x48\xc1\xe7\x04&#x27;</span>)<br><br><span class="hljs-keyword">if</span> <span class="hljs-string">&#x27;--fast&#x27;</span> <span class="hljs-keyword">in</span> argv:<br>    <span class="hljs-comment"># usleep (endbr64) -&gt; shr $0x4, %rdi</span><br>    patch(name(<span class="hljs-string">&#x27;usleep&#x27;</span>), <span class="hljs-string">b&#x27;\x48\xc1\xef\x04&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="print-no-link">#jyy操作系统</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>应用视角的操作系统</div>
+      <div>http://example.com/2023/08/02/Linux进程地址空间/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/08/02/%E4%BB%A3%E7%A0%81%E9%A3%8E%E6%A0%BC%E5%92%8C%E5%AE%9A%E5%88%B6%E5%8C%96gdb%E8%B0%83%E8%AF%95/" title="应用视角的操作系统">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">应用视角的操作系统</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/02/fork%E7%9A%84%E5%BA%94%E7%94%A8/" title="应用视角的操作系统">
+                        <span class="hidden-mobile">应用视角的操作系统</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
