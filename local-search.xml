@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>线程池概述</title>
+    <link href="/2023/08/05/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/"/>
+    <url>/2023/08/05/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="1-线程池的原理"><a href="#1-线程池的原理" class="headerlink" title="1.线程池的原理"></a>1.线程池的原理</h2><p>为什么需要线程池</p><ul><li>并发的线程数目较多，假如每一个线程都只是执行一个时间很短的任务就结束了，那么这样频繁的创建线程就会大大降低系统的效率，因为频繁创建和销毁线程都需要时间。</li></ul><p>线程池就是使得线程可以复用，一个线程执行完一个任务后并不销毁。线程池里的线程都是后台线程。如果某个线程在托管代码中空闲，那么线程池将插入另一个辅助线程来使所有处理器繁忙。如果线程池中的所有线程都繁忙，但队列中包含挂起的任务，那么线程池应该创建一个辅助线程但线程的总数不应超过最大值。超过最大值的线程需要排队。</p><h3 id="线程池的组成"><a href="#线程池的组成" class="headerlink" title="线程池的组成"></a>线程池的组成</h3><h4 id="任务队列"><a href="#任务队列" class="headerlink" title="任务队列"></a>任务队列</h4><p>存储需要处理的任务，由工作的线程来处理这些任务，线程池threadpool中就是存储这些待处理的任务。</p><blockquote><p>生产者消费者模型：生产者线程往任务队列里放任务，消费者线程把任务从队列中取出去。</p></blockquote><h4 id="工作的线程"><a href="#工作的线程" class="headerlink" title="工作的线程"></a>工作的线程</h4><p>任务队列的消费者。它们不停地读取任务队列，从中取出任务并处理。<br>如果任务队列为空，工作的线程将被阻塞；如果阻塞后有新的任务，由生产者将阻塞解除，工作线程开始工作。</p><h4 id="管理者线程"><a href="#管理者线程" class="headerlink" title="管理者线程"></a>管理者线程</h4><p>周期性地对任务队列中任务的数量以及处于忙碌状态的工作线程进行检测。</p><ul><li>任务过多的时候，可以创建一些新的工作线程</li><li>任务过少时，可以销毁一些工作线程</li></ul><hr><h2 id="2-项目介绍"><a href="#2-项目介绍" class="headerlink" title="2.项目介绍"></a>2.项目介绍</h2><h3 id="相关函数介绍"><a href="#相关函数介绍" class="headerlink" title="相关函数介绍"></a>相关函数介绍</h3><p>首先需要介绍几个<code>pthread.h</code>的库函数。<br><code>pthread_create(pthread_t *restrict thread, const pthread_attr_t`` *restrict attr, void *(*start_routine)(void *),void *restrict arg)</code>:创建线程, <code>start_rountine</code>作为线程起始执行函数，<code>arg</code>是传进该函数的参数。</p><p><code>pthread_join(pthread_t thread, void **retval)</code>:等待 <code>thread</code>线程结束，调用该函数的线程将被阻塞。</p><p><code>pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex)</code>: 在调用这个函数前，都要获取<code>mutex</code>互斥锁。然后挂起该线程，阻塞的时候释放<code>mutex</code>这把锁（避免死锁）。等到再被唤醒的时候，他又会重新获取<code>mutex</code>这把锁。</p><p><code>pthread_signal(pthread_cond_t *cond)</code>:唤醒阻塞在<code>cond</code>条件变量上的所有线程，通常配合上面的函数一起使用。</p><h3 id="代码实现思路"><a href="#代码实现思路" class="headerlink" title="代码实现思路"></a>代码实现思路</h3><ol><li>存活线程：是等待执行任务的线程或者已经在执行任务的线程</li><li>忙碌线程：已经在执行任务的线程</li></ol><ul><li>需要创建一个管理者线程，传入一个函数指针<code>manage</code>,这个<code>manage</code>函数是一个<code>while</code>循环，它每隔一段时间就做一次检查，判断是否需要添加新的存活线程或者销毁存活线程。</li><li>创建多个存活线程，传入函数指针<code>worker</code>,同样，这个<code>worker</code>函数也是一个<code>while</code>循环，不断处理线程池中的待处理任务。在获取了线程池中的任务后，待处理任务的执行就是一个函数调用，函数完成后接着下一次的<code>while</code>循环判断。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>项目</category>
+      
+      <category>线程池</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>项目</tag>
+      
+      <tag>线程池</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>状态机模型的应用</title>
     <link href="/2023/08/02/%E7%8A%B6%E6%80%81%E6%9C%BA%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%BA%94%E7%94%A8/"/>
     <url>/2023/08/02/%E7%8A%B6%E6%80%81%E6%9C%BA%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%BA%94%E7%94%A8/</url>
