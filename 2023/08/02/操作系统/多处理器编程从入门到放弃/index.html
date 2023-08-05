@@ -16,22 +16,22 @@
   <meta name="author" content="LiuZhaocheng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="本讲内容：多处理器编程：从入门到放弃： 入门：多线程编程库 放弃：原子性、可见性、顺序  入门每个线程都有自己的堆栈，如何确定各自的堆栈大小？ 1234567891011121314151617181920212223242526272829303132#include &quot;thread.h&quot;void * volatile low[64];void * volatile high">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2023/08/02/hello-world/index.html">
+<meta property="og:title" content="多处理器编程从入门到放弃">
+<meta property="og:url" content="http://example.com/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E7%BC%96%E7%A8%8B%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83/index.html">
 <meta property="og:site_name" content="BlackGhost">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="本讲内容：多处理器编程：从入门到放弃： 入门：多线程编程库 放弃：原子性、可见性、顺序  入门每个线程都有自己的堆栈，如何确定各自的堆栈大小？ 1234567891011121314151617181920212223242526272829303132#include &quot;thread.h&quot;void * volatile low[64];void * volatile high">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-08-02T11:20:00.742Z">
-<meta property="article:modified_time" content="2023-08-02T13:40:50.396Z">
+<meta property="article:published_time" content="2023-08-02T15:36:41.965Z">
+<meta property="article:modified_time" content="2023-08-02T15:47:28.475Z">
 <meta property="article:author" content="LiuZhaocheng">
-<meta property="article:tag" content="杂文">
+<meta property="article:tag" content="jyy操作系统">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Hello World - BlackGhost</title>
+  <title>多处理器编程从入门到放弃 - BlackGhost</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -197,7 +197,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text="多处理器编程从入门到放弃"></span>
           
         </div>
 
@@ -208,7 +208,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-08-02 19:20" pubdate>
+        <time datetime="2023-08-02 23:36" pubdate>
           2023年8月2日 晚上
         </time>
       </span>
@@ -220,7 +220,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          367 字
+          1.1k 字
         
       </span>
     
@@ -231,7 +231,7 @@
         
         
         
-          4 分钟
+          10 分钟
         
       </span>
     
@@ -276,24 +276,29 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Hello World</h1>
+            <h1 id="seo-header">多处理器编程从入门到放弃</h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <h2 id="本讲内容：多处理器编程：从入门到放弃："><a href="#本讲内容：多处理器编程：从入门到放弃：" class="headerlink" title="本讲内容：多处理器编程：从入门到放弃："></a>本讲内容：多处理器编程：从入门到放弃：</h2><ul>
+<li>入门：多线程编程库</li>
+<li>放弃：原子性、可见性、顺序</li>
+</ul>
+<h2 id="入门"><a href="#入门" class="headerlink" title="入门"></a>入门</h2><p>每个线程都有自己的堆栈，如何确定各自的堆栈大小？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;thread.h&quot;</span></span><br><br><span class="hljs-type">void</span> * <span class="hljs-keyword">volatile</span> low[<span class="hljs-number">64</span>];<br><span class="hljs-type">void</span> * <span class="hljs-keyword">volatile</span> high[<span class="hljs-number">64</span>];<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">update_range</span><span class="hljs-params">(<span class="hljs-type">int</span> T, <span class="hljs-type">void</span> *ptr)</span> &#123;<br>    <span class="hljs-keyword">if</span> (ptr &lt; low[T]) low[T] = ptr;<br>    <span class="hljs-keyword">if</span> (ptr &gt; high[T]) high[T] = ptr;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">probe</span><span class="hljs-params">(<span class="hljs-type">int</span> T, <span class="hljs-type">int</span> n)</span> &#123;<br>  update_range(T, &amp;n);<br>  <span class="hljs-type">long</span> sz = (<span class="hljs-type">uintptr_t</span>)high[T] - (<span class="hljs-type">uintptr_t</span>)low[T];<br>  <span class="hljs-keyword">if</span> (sz % <span class="hljs-number">1024</span> &lt; <span class="hljs-number">32</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Stack(T%d) &gt;= %ld KB\n&quot;</span>, T, sz / <span class="hljs-number">1024</span>);<br>  &#125;<br>  probe(T, n + <span class="hljs-number">1</span>);  <span class="hljs-comment">// Infinite recursion</span><br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">Tprobe</span><span class="hljs-params">(<span class="hljs-type">int</span> T)</span> &#123;<br>  low[T] = (<span class="hljs-type">void</span> *)<span class="hljs-number">-1</span>;<br>  high[T] = (<span class="hljs-type">void</span> *)<span class="hljs-number">0</span>;<br>  update_range(T, &amp;T);<br>  probe(T, <span class="hljs-number">0</span>);<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  setbuf(<span class="hljs-built_in">stdout</span>, <span class="hljs-literal">NULL</span>);<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">4</span>; i++) &#123;<br>    create(Tprobe);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>为什么要 setbuf(stdout, NULL) 关闭缓冲区？</p>
+<blockquote>
+<p>有时候一个printf明明在crash前的代码运行了，但没有得到输出，原因是什么呢？<br>是因为printf先把输出放在缓冲区里。</p>
+</blockquote>
+<p>这段代码的核心思想就是无穷递归，利用函数参数存储在栈空间里估算栈的大小。</p>
+<h2 id="放弃：原子性"><a href="#放弃：原子性" class="headerlink" title="放弃：原子性"></a>放弃：原子性</h2><p>示例代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;thread.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> N 100000000</span><br><br><span class="hljs-type">long</span> sum = <span class="hljs-number">0</span>;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">Tsum</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) &#123;<br>    sum++;<br>  &#125;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  create(Tsum);<br>  create(Tsum);<br>  join();<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;sum = %ld\n&quot;</span>, sum);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>编译优化 -O2得到答案 200000000</p>
+<blockquote>
+<p>编译器直接计算出答案，一条指令赋值给sum</p>
+</blockquote>
+<p>编译优化 -O1得到答案 100000000</p>
 
                 
               </div>
@@ -312,7 +317,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%9D%82%E6%96%87/" class="category-chain-item">杂文</a>
+  <a href="/categories/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
   
   
 
@@ -327,7 +332,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%9D%82%E6%96%87/" class="print-no-link">#杂文</a>
+        <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="print-no-link">#jyy操作系统</a>
       
     </div>
   
@@ -339,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello World</div>
-      <div>http://example.com/2023/08/02/hello-world/</div>
+      <div>多处理器编程从入门到放弃</div>
+      <div>http://example.com/2023/08/02/操作系统/多处理器编程从入门到放弃/</div>
     </div>
     <div class="license-meta">
       
@@ -384,15 +389,21 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%BA%94%E7%94%A8%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="应用视角的操作系统">
+                      <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F/" title="可执行程序">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">应用视角的操作系统</span>
+                        <span class="hidden-mobile">可执行程序</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A0%E8%BD%BD(2)/" title="动态链接和加载(2)">
+                        <span class="hidden-mobile">动态链接和加载(2)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
