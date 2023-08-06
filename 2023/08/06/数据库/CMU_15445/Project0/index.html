@@ -1,0 +1,756 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前置知识书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。 左值引用和右值引用 左值是可以放在赋值号左边的，左值必须要在内存中有实体。 右值出现在赋值号右边；右值可以在寄存器也可以在内存中。  123int num &#x3D; 10;int &amp;b &#x3D; num;int &amp;c &#x3D; 10; &#x2F;&#x2F; 错误 上面。n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMU_15445：Project C++ Primer">
+<meta property="og:url" content="http://example.com/2023/08/06/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Project0/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="前置知识书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。 左值引用和右值引用 左值是可以放在赋值号左边的，左值必须要在内存中有实体。 右值出现在赋值号右边；右值可以在寄存器也可以在内存中。  123int num &#x3D; 10;int &amp;b &#x3D; num;int &amp;c &#x3D; 10; &#x2F;&#x2F; 错误 上面。n">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-06T03:19:23.473Z">
+<meta property="article:modified_time" content="2023-08-06T03:21:36.703Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="CMU_15445">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>CMU_15445：Project C++ Primer - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CMU_15445：Project C++ Primer"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-06 11:19" pubdate>
+          2023年8月6日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          56 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CMU_15445：Project C++ Primer</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。</p>
+<h3 id="左值引用和右值引用"><a href="#左值引用和右值引用" class="headerlink" title="左值引用和右值引用"></a>左值引用和右值引用</h3><ul>
+<li>左值是可以放在赋值号左边的，左值必须要在内存中有实体。</li>
+<li>右值出现在赋值号右边；右值可以在寄存器也可以在内存中。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> num = <span class="hljs-number">10</span>;<br><span class="hljs-type">int</span> &amp;b = num;<br><span class="hljs-type">int</span> &amp;c = <span class="hljs-number">10</span>; <span class="hljs-comment">// 错误</span><br></code></pre></td></tr></table></figure>
+<p>上面。<code>num</code>有地址是左值，<code>b</code>是对<code>num</code>的引用，所以这是左值引用。而10是右值，所以<code>c</code>是右值引用，这里是错误的。<br>但这样又是可以的：<br><code>const int&amp; c =10</code>,允许使用常量左值引用操作右值。<br>实际开发中我们可能需要对右值进行修改（实现移动语义时就需要），显然左值引用的方式是行不通的。</p>
+<h4 id="右值引用介绍"><a href="#右值引用介绍" class="headerlink" title="右值引用介绍"></a>右值引用介绍</h4><p>右值引用也必须立即进行初始化操作，且<strong>使用右值进行初始化</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span>&amp;&amp; a = <span class="hljs-number">10</span>;<br>a = <span class="hljs-number">100</span>;<br></code></pre></td></tr></table></figure>
+<p>上面的操作都是正确的。<br>右值引用 引用 右值，会使右值被存储到特定的位置。</p>
+<ul>
+<li>左值引用的短板<br>传值传参和传值返回都会产生拷贝，有的甚至是深拷贝，代价很大。而左值引用的实际意义在于做参数和做返回值都可以减少拷贝，从而提高效率。但是，左值引用的短板是不能够<strong>引用局部变量</strong>。</li>
+</ul>
+<h4 id="简单例子"><a href="#简单例子" class="headerlink" title="简单例子"></a>简单例子</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><br><span class="hljs-comment">// 接收一个 std::vector&lt;int&gt; 的右值引用参数</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">processVector</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt;&amp;&amp; vec)</span> &#123;<br>    <span class="hljs-comment">// 对右值引用进行操作，而不进行拷贝</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> num : vec) &#123;<br>        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; num &lt;&lt; <span class="hljs-string">&quot; &quot;</span>;<br>    &#125;<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt; nums = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;;<br>    <span class="hljs-comment">// 将 nums 作为右值传递给函数</span><br>    processVector(<span class="hljs-built_in">std</span>::move(nums));<br><br>    <span class="hljs-comment">// 此时 nums 已被移动，不再可用</span><br>    <span class="hljs-comment">// 这里访问 nums 将导致未定义的行为</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>右值引用的特性是可以绑定到临时对象（右值）上的引用，而临时对象在表达式求值后就会被销毁。因此，当我们将<code>nums</code>通过<code>std::move()</code>转换为右值引用后，它的值类别变为右值，而不再是左值。<br>在函数参数中接收到右值引用 vec 后，我们可以直接操作它，而不需要进行对象拷贝。这是因为右值引用的特性允许我们“窃取”临时对象的资源，而不是进行拷贝。在这种情况下，我们可以直接使用 <code>vec</code> 的资源（例如 <code>std::vector</code> 中的数据），而不需要进行额外的拷贝操作。</p>
+<h4 id="move移动语义"><a href="#move移动语义" class="headerlink" title="move移动语义"></a>move移动语义</h4><p>作用是将一个左值强制转化为右值，以实现移动语义。左值被 move 后变为右值，于是右值引用可以引用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> t = <span class="hljs-number">10</span>;<br><span class="hljs-comment">//int&amp;&amp; rrt = t; // 编译报错，不能直接引用左值</span><br><br><span class="hljs-comment">// 2.但是右值引用可以引用被move的左值</span><br><span class="hljs-type">int</span>&amp;&amp; rrt = <span class="hljs-built_in">std</span>::move(t);  <span class="hljs-comment">//正确</span><br></code></pre></td></tr></table></figure>
+<p>右值引用意义和移动构造函数:<br>右值做参数，那么就会调用移动构造，而调用移动构造就会减少拷贝（如果是像 string 这样的在堆空间上存在资源的类，那么每调用一次移动构造就会少做一次深拷贝。</p>
+<h4 id="forward完美转发"><a href="#forward完美转发" class="headerlink" title="forward完美转发"></a>forward完美转发</h4><p>有了<code>move</code>函数之后，我们又遇到了一个新的问题：</p>
+<p>按照上面的写法，处理临时变量用右值引用<code>T&amp;&amp;</code>，处理普通变量用<code>const</code>引用<code>const T&amp;</code>，我们需要分别建立两个函数，然后入参使用不同的类型，每个函数都要写两遍。<br>那么能不能避免重复，将<code>T &amp;&amp;</code>类型和<code>const T &amp;</code>类型合二为一呢？</p>
+<blockquote>
+<p>答案就是：<code>forward</code>函数，<code>std::forward</code>也被称为完美转发，即：保持原来的值属性不变：</p>
+</blockquote>
+<ul>
+<li>如果原来的值是左值，经<code>std::forward</code>处理后该值还是左值。</li>
+<li>如果原来的值是右值，经<code>std::forward</code>处理后它还是右值。<br>这样一来，我们就可以使用<code>forward</code>函数对入参进行封装，从而保证了入参的统一性，从而可以实现一个方法处理两种类型！<br>正因为如此，<code>forward</code>函数被大量用在了入参值类型情况不确定的C++模板中！</li>
+</ul>
+<h3 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h3><p><code>std::unique_ptr</code>是一个智能指针类模板，用于管理动态分配的对象。它提供了独占所有权的语义，意味着一个<code>unique_ptr</code>指针可以拥有对一个对象的唯一所有权，并负责在其生命周期结束时自动释放该对象。</p>
+<ul>
+<li><code>move</code>: 转移所有权，将原指针置空。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title function_">ptr1</span><span class="hljs-params">(new <span class="hljs-type">int</span>(<span class="hljs-number">10</span>))</span>;<br><span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;<span class="hljs-type">int</span>&gt; ptr2 = <span class="hljs-built_in">std</span>::move(ptr1); <span class="hljs-comment">// 移动所有权</span><br><br><span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;<span class="hljs-type">int</span>&gt;&gt; vec;<br>vec.push_back(<span class="hljs-built_in">std</span>::make_unique&lt;<span class="hljs-type">int</span>&gt;(<span class="hljs-number">20</span>)); <span class="hljs-comment">// 移动 unique_ptr 到容器中</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>reset</code>:更改所有权。</li>
+</ul>
+<ol>
+<li><code>ptr.reset()</code>:销毁对象，指针置空。</li>
+<li><code>ptr.reset(new_ptr)</code>:智能指针指向新的对象，原对象销毁。</li>
+</ol>
+<ul>
+<li><code>get</code>：<code>get()</code>是<code> unique_ptr</code>类的成员函数，它返回指向<code>unique_ptr</code>所拥有的对象的指针，即原始指针。</li>
+</ul>
+<hr>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>说了这么多，如果感觉还不是很懂，就直接来看代码吧。<br>我这里只介绍一些比较重要的函数。</p>
+<h3 id="TrieNode"><a href="#TrieNode" class="headerlink" title="TrieNode"></a>TrieNode</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">TrieNode(TrieNode &amp;&amp;other_trie_node) noexcept &#123;<br>    key_char_ = other_trie_node.key_char_;<br>    is_end_ = other_trie_node.is_end_;<br>    children_.swap(other_trie_node.children_);<br>  &#125;<br></code></pre></td></tr></table></figure>
+<p>这就是移动构造函数。<br>调用<code> children_.swap(other_trie_node.children_)</code>，使用<code> std::swap</code>函数将 <code>other_trie_node</code> 的 <code>children_</code> 成员变量与当前对象的 <code>children_</code>成员变量进行交换。这样做可以实现高效的移动操作，避免不必要的复制。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *<span class="hljs-title function_">InsertChildNode</span><span class="hljs-params">(<span class="hljs-type">char</span> key_char, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; &amp;&amp;child)</span> &#123;<br>    <span class="hljs-keyword">if</span> (HasChild(key_char) || key_char != child-&gt;key_char_) &#123;<br>      <span class="hljs-keyword">return</span> nullptr;<br>    &#125;<br>    children_[key_char] = <span class="hljs-built_in">std</span>::move(child);<br>    <span class="hljs-keyword">return</span> &amp;children_[key_char];<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *<span class="hljs-title function_">GetChildNode</span><span class="hljs-params">(<span class="hljs-type">char</span> key_char)</span> &#123;<br>    <span class="hljs-keyword">auto</span> node = children_.find(key_char);<br>    <span class="hljs-keyword">if</span> (node != children_.end()) &#123;<br>      <span class="hljs-keyword">return</span> &amp;(node-&gt;second);<br>    &#125;<br>    <span class="hljs-keyword">return</span> nullptr;<br>  &#125;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><p>为什么返回的都是智能指针的指针？</p>
+<blockquote>
+<p>因为智能指针对一个对象有唯一的所有权,如果我们在字典树的操作中需要不断迭代的话，需要移动指针，那就需要用到智能指针的指针了。</p>
+</blockquote>
+</li>
+<li><p>为什么要<code>children_[key_char] = std::move(child)</code>?</p>
+<blockquote>
+<p>child 是一个右值引用的 std::unique_ptr<TrieNode>，应该直接将其移动给 children_[key_char]。child 的所有权转移给 children_[key_char]，而不是重新构造一个新的 std::unique_ptr。这样做可以避免不必要的内存分配和析构，并正确地转移所有权。</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">RemoveChildNode</span><span class="hljs-params">(<span class="hljs-type">char</span> key_char)</span> &#123;<br>    <span class="hljs-keyword">auto</span> node = children_.find(key_char);<br>    <span class="hljs-keyword">if</span> (node != children_.end()) &#123;<br>      node-&gt;second.reset();<br>      children_.erase(key_char);<br>    &#125;<br>  &#125;<br><br></code></pre></td></tr></table></figure>
+
+
+<h3 id="TrieNodeWithValue"><a href="#TrieNodeWithValue" class="headerlink" title="TrieNodeWithValue"></a>TrieNodeWithValue</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">TrieNodeWithValue(TrieNode &amp;&amp;trieNode, T value) : TrieNode(<span class="hljs-built_in">std</span>::forward&lt;TrieNode&gt;(trieNode)) &#123;<br>    value_ = value;<br>    SetEndNode(<span class="hljs-literal">true</span>);<br>  &#125;<br></code></pre></td></tr></table></figure>
+<p>移动构造函数，把<code>trieNode</code>作为右值传递给<code>TrieNodeWithValue</code>，实现资源的转移。</p>
+<h3 id="Trie"><a href="#Trie" class="headerlink" title="Trie"></a>Trie</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs c">template &lt;typename T&gt;<br>  <span class="hljs-type">bool</span> <span class="hljs-title function_">Insert</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> &amp;key, T value)</span> &#123;<br>     <span class="hljs-keyword">if</span> (key.empty()) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    latch_.WLock();<br>    <span class="hljs-keyword">auto</span> cur = &amp;root_;<br>    <span class="hljs-comment">// latch_.WLock();</span><br>    <span class="hljs-keyword">auto</span> c = key.begin();<br><br>    <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>      <span class="hljs-keyword">auto</span> x = c++;<br>      <span class="hljs-keyword">if</span> (c == key.end()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span> (cur-&gt;get()-&gt;HasChild(*x)) &#123;<br>        cur = cur-&gt;get()-&gt;GetChildNode(*x);<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        cur = cur-&gt;get()-&gt;InsertChildNode(*x, <span class="hljs-built_in">std</span>::make_unique&lt;TrieNode&gt;(*x));<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-type">char</span> ch = key.back();<br>    <span class="hljs-keyword">auto</span> end_node = cur-&gt;get()-&gt;GetChildNode(ch);<br><br>    <span class="hljs-keyword">if</span> (end_node != nullptr &amp;&amp; end_node-&gt;get()-&gt;IsEndNode()) &#123;<br>      latch_.WUnlock();<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (end_node != nullptr) &#123;<br>      <span class="hljs-keyword">auto</span> new_node = new TrieNodeWithValue&lt;T&gt;(<span class="hljs-built_in">std</span>::move(*(end_node-&gt;get())), value);<br>      end_node-&gt;reset(new_node);<br><br>      latch_.WUnlock();<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 如果为空</span><br>    cur = cur-&gt;get()-&gt;InsertChildNode(ch, <span class="hljs-built_in">std</span>::make_unique&lt;TrieNode&gt;(ch));<br>    <span class="hljs-comment">// 现在还是一个中间节点，还不是TrieNodeWithValue</span><br>    <span class="hljs-keyword">auto</span> new_node = new TrieNodeWithValue&lt;T&gt;(<span class="hljs-built_in">std</span>::move(**cur), value);<br>    cur-&gt;reset(new_node);<br>    latch_.WUnlock();<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">Remove</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> &amp;key)</span> &#123;<br>    <span class="hljs-keyword">if</span> (key.empty()) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br>    latch_.WLock();<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *&gt; storage;<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *node = &amp;root_;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> ch : key) &#123;<br>      storage.emplace_back(node);<br>      <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *next = node-&gt;get()-&gt;GetChildNode(ch);<br><br>      <span class="hljs-keyword">if</span> (next == nullptr) &#123;<br>        latch_.WUnlock();<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>      &#125;<br><br>      node = next;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (node-&gt;get()-&gt;HasChildren()) &#123;<br>      <span class="hljs-comment">// node = node-&gt;get()-&gt;GetChildNode(key[key.size()-1]);</span><br>      node-&gt;get()-&gt;SetEndNode(<span class="hljs-literal">false</span>);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = storage.size() - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) &#123;<br>        <span class="hljs-comment">// 想一下， root 节点是不记录字符的</span><br>        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unique_ptr</span>&lt;TrieNode&gt; *pre = storage[i];<br>        <span class="hljs-keyword">if</span> ((i &lt; static_cast&lt;<span class="hljs-type">int</span>&gt;(key.size() - <span class="hljs-number">1</span>)) &amp;&amp; (node-&gt;get()-&gt;IsEndNode() || node-&gt;get()-&gt;HasChildren())) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>        pre-&gt;get()-&gt;RemoveChildNode(key[i]);<br>        node = pre;<br>      &#125;<br>    &#125;<br><br>    latch_.WUnlock();<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>  &#125;<br><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c">template &lt;typename T&gt;<br>  T <span class="hljs-title function_">GetValue</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> &amp;key, <span class="hljs-type">bool</span> *success)</span> &#123;<br>    *success = <span class="hljs-literal">true</span>;<br>    latch_.RLock();<br>    <span class="hljs-keyword">if</span> (key.empty()) &#123;<br>      *success = <span class="hljs-literal">false</span>;<br>      <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br><br>    <span class="hljs-keyword">auto</span> cur = &amp;root_;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> ch : key) &#123;<br>      <span class="hljs-keyword">if</span> (cur-&gt;get()-&gt;HasChild(ch)) &#123;<br>        cur = cur-&gt;get()-&gt;GetChildNode(ch);<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        *success = <span class="hljs-literal">false</span>;<br>        latch_.RUnlock();<br>        <span class="hljs-keyword">return</span> &#123;&#125;;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!cur-&gt;get()-&gt;IsEndNode()) &#123;<br>      *success = <span class="hljs-literal">false</span>;<br>      latch_.RUnlock();<br>      <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br><br>    <span class="hljs-keyword">auto</span> flag_node = dynamic_cast&lt;TrieNodeWithValue&lt;T&gt; *&gt;(cur-&gt;get());<br>    <span class="hljs-keyword">if</span> (flag_node == nullptr) &#123;<br>      *success = <span class="hljs-literal">false</span>;<br>      latch_.RUnlock();<br>      <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br><br>    latch_.RUnlock();<br>    <span class="hljs-keyword">return</span> flag_node-&gt;GetValue();<br>  &#125;<br>&#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/CMU-15445/" class="print-no-link">#CMU_15445</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CMU_15445：Project C++ Primer</div>
+      <div>http://example.com/2023/08/06/数据库/CMU_15445/Project0/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" title="线程池的C语言实现">
+                        <span class="hidden-mobile">线程池的C语言实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
