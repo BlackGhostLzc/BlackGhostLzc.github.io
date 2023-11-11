@@ -16,15 +16,15 @@
   <meta name="author" content="LiuZhaocheng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="BlackGhost的个人博客">
+    <meta name="description" content="Peterson算法在介绍Peterson算法之前，我们首先对我们作出以下基本假设：内存的读&#x2F;写可以保证顺序、原子地完成。 Peterson算法：A 和 B 争用厕所的包厢  想进入包厢之前，A&#x2F;B 都首先举起自己的旗子 A 往厕所门上贴上 “B 正在使用” 的标签 B 往厕所门上贴上 “A 正在使用” 的标签   然后，如果对方举着旗，且门上的名字是对方，等待 否则可以进入包">
 <meta property="og:type" content="article">
-<meta property="og:title" content="状态机模型的应用">
-<meta property="og:url" content="http://example.com/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%8A%B6%E6%80%81%E6%9C%BA%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:title" content="并发控制基础">
+<meta property="og:url" content="http://example.com/2023/11/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="BlackGhost">
-<meta property="og:description" content="BlackGhost的个人博客">
+<meta property="og:description" content="Peterson算法在介绍Peterson算法之前，我们首先对我们作出以下基本假设：内存的读&#x2F;写可以保证顺序、原子地完成。 Peterson算法：A 和 B 争用厕所的包厢  想进入包厢之前，A&#x2F;B 都首先举起自己的旗子 A 往厕所门上贴上 “B 正在使用” 的标签 B 往厕所门上贴上 “A 正在使用” 的标签   然后，如果对方举着旗，且门上的名字是对方，等待 否则可以进入包">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-08-02T15:48:04.075Z">
-<meta property="article:modified_time" content="2023-08-05T07:19:28.028Z">
+<meta property="article:published_time" content="2023-11-11T04:31:46.761Z">
+<meta property="article:modified_time" content="2023-11-11T04:34:44.872Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="jyy操作系统">
 <meta property="article:tag" content="操作系统">
@@ -32,7 +32,7 @@
   
   
   
-  <title>状态机模型的应用 - BlackGhost</title>
+  <title>并发控制基础 - BlackGhost</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="状态机模型的应用"></span>
+            <span id="subtitle" data-typed-text="并发控制基础"></span>
           
         </div>
 
@@ -238,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-08-02 23:48" pubdate>
-          2023年8月2日 晚上
+        <time datetime="2023-11-11 12:31" pubdate>
+          2023年11月11日 下午
         </time>
       </span>
     
@@ -250,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          0 字
+          2.2k 字
         
       </span>
     
@@ -261,7 +261,7 @@
         
         
         
-          1 分钟
+          19 分钟
         
       </span>
     
@@ -306,12 +306,38 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">状态机模型的应用</h1>
+            <h1 id="seo-header">并发控制基础</h1>
             
             
               <div class="markdown-body">
                 
-                
+                <h2 id="Peterson算法"><a href="#Peterson算法" class="headerlink" title="Peterson算法"></a>Peterson算法</h2><p>在介绍Peterson算法之前，我们首先对我们作出以下基本假设：内存的读&#x2F;写可以保证顺序、原子地完成。</p>
+<h3 id="Peterson算法："><a href="#Peterson算法：" class="headerlink" title="Peterson算法："></a>Peterson算法：</h3><p>A 和 B 争用厕所的包厢</p>
+<ul>
+<li>想进入包厢之前，A&#x2F;B 都首先举起自己的旗子<ul>
+<li>A 往厕所门上贴上 “B 正在使用” 的标签</li>
+<li>B 往厕所门上贴上 “A 正在使用” 的标签</li>
+</ul>
+</li>
+<li>然后，<strong>如果对方举着旗，且门上的名字是对方</strong>，等待<ul>
+<li>否则可以进入包厢</li>
+</ul>
+</li>
+<li>出包厢后，放下自己的旗子 (完全不管门上的标签)</li>
+</ul>
+<h3 id="如何验证该算法的正确性？"><a href="#如何验证该算法的正确性？" class="headerlink" title="如何验证该算法的正确性？"></a>如何验证该算法的正确性？</h3><p>jyy老师给出了一个用Python实现的model checker。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">T1</span>():<br>  <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    heap.x = <span class="hljs-string">&#x27;🏴&#x27;</span><br>    sys_sched()<br>    heap.turn = <span class="hljs-string">&#x27;❷&#x27;</span><br>    sys_sched()<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>      t = heap.turn<br>      sys_sched()<br>      y = heap.y != <span class="hljs-string">&#x27;&#x27;</span><br>      sys_sched()<br>      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> y <span class="hljs-keyword">or</span> t == <span class="hljs-string">&#x27;❶&#x27;</span>:<br>        <span class="hljs-keyword">break</span><br>    sys_sched()<br>    heap.cs += <span class="hljs-string">&#x27;❶&#x27;</span><br>    sys_sched()<br>    heap.cs = heap.cs.replace(<span class="hljs-string">&#x27;❶&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>)<br>    sys_sched()<br>    heap.x = <span class="hljs-string">&#x27;&#x27;</span><br>    sys_sched()<br> <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">T2</span>():<br>  <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    heap.y = <span class="hljs-string">&#x27;🏁&#x27;</span><br>    sys_sched()<br>    heap.turn = <span class="hljs-string">&#x27;❶&#x27;</span><br>    sys_sched()<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>      t = heap.turn<br>      sys_sched()<br>      x = heap.x<br>      sys_sched()<br>      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> x <span class="hljs-keyword">or</span> t == <span class="hljs-string">&#x27;❷&#x27;</span>:<br>        <span class="hljs-keyword">break</span><br>      sys_sched()<br>    sys_sched()<br>    heap.cs += <span class="hljs-string">&#x27;❷&#x27;</span><br>    sys_sched()<br>    heap.cs = heap.cs.replace(<span class="hljs-string">&#x27;❷&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>)<br>    sys_sched()<br>    heap.y = <span class="hljs-string">&#x27;&#x27;</span><br>    sys_sched()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>  heap.x = <span class="hljs-string">&#x27;&#x27;</span><br>  heap.y = <span class="hljs-string">&#x27;&#x27;</span><br>  heap.turn = <span class="hljs-string">&#x27;&#x27;</span><br>  heap.cs = <span class="hljs-string">&#x27;&#x27;</span><br>  sys_spawn(T1)<br>  sys_spawn(T2)<br></code></pre></td></tr></table></figure>
+<p>其中<code>sys_spawn</code>和<code>sys_sched</code>函数的实现在前面的课中提到过，我没看到，在model checker中，为了保证我们的基本假设，我们看到在每一次读写变量的时候都调用了<code>sys_sched</code>函数。</p>
+<h2 id="Compiler-barrier-volatile"><a href="#Compiler-barrier-volatile" class="headerlink" title="Compiler barrier&#x2F;volatile"></a>Compiler barrier&#x2F;volatile</h2><p>从模型回到现实，我们希望处理器和编译器能够配合，实现原子指令。实际上按照上面模型直接写的Peterson算法其实是错的。</p>
+<p>Compiler barrier（编译器屏障）是一种编译器指令，用于告诉编译器在此处不要对代码进行优化重排。</p>
+<blockquote>
+<p>编译器提供 __sync_synchronize() 函数,它的作用是确保在执行该函数之前的所有写操作都完成，并且在执行该函数之后的所有读操作都开始。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> BARRIER __sync_synchronize()</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">TA</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>    x = <span class="hljs-number">1</span>;                   BARRIER;<br>    turn = B;                BARRIER; <span class="hljs-comment">// &lt;- this is critcal for x86</span><br>    <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-keyword">if</span> (!y) <span class="hljs-keyword">break</span>;         BARRIER;<br>      <span class="hljs-keyword">if</span> (turn != B) <span class="hljs-keyword">break</span>;  BARRIER;<br>    &#125;<br>    critical_section();<br>    x = <span class="hljs-number">0</span>;                   BARRIER;<br>  &#125;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">TB</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>    y = <span class="hljs-number">1</span>;                   BARRIER;<br>    turn = A;                BARRIER;<br>    <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-keyword">if</span> (!x) <span class="hljs-keyword">break</span>;         BARRIER;<br>      <span class="hljs-keyword">if</span> (turn != A) <span class="hljs-keyword">break</span>;  BARRIER;<br>    &#125;<br>    critical_section();<br>    y = <span class="hljs-number">0</span>;                   BARRIER;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这样就正确实现了Peterson算法。<br>通过使用内存屏障，可以强制编译器在特定位置插入同步指令，以确保对共享变量的读写操作按照预期顺序进行，并且对其他线程可见。这样，当一个线程在调用 <code>_sync_synchronize()</code>之前的写操作完成后，其他线程在调用 <code>_sync_synchronize()</code>之后的读操作才能看到这些写操作的结果，从而保证了线程间的正确同步和协作。</p>
+<h2 id="原子指令"><a href="#原子指令" class="headerlink" title="原子指令"></a>原子指令</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">atomic_inc</span><span class="hljs-params">(<span class="hljs-type">long</span> *ptr)</span> &#123;<br>  <span class="hljs-keyword">asm</span> <span class="hljs-title function_">volatile</span><span class="hljs-params">(</span><br><span class="hljs-params">    <span class="hljs-string">&quot;lock incq %0&quot;</span>  <span class="hljs-comment">// Atomic + memory fence</span></span><br><span class="hljs-params">    : <span class="hljs-string">&quot;+m&quot;</span>(*ptr)</span><br><span class="hljs-params">    :</span><br><span class="hljs-params">    : <span class="hljs-string">&quot;memory&quot;</span></span><br><span class="hljs-params">  )</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>其中的这个<code>lock</code>就是总线<code>lock</code>,保证了多处理器中，只有一个处理器能够读写内存</p>
+
                 
               </div>
             
@@ -365,8 +391,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>状态机模型的应用</div>
-      <div>http://example.com/2023/08/02/操作系统/jyy操作系统/状态机模型的应用/</div>
+      <div>并发控制基础</div>
+      <div>http://example.com/2023/11/11/操作系统/jyy操作系统/并发控制基础/</div>
     </div>
     <div class="license-meta">
       
@@ -378,7 +404,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年8月2日</div>
+          <div>2023年11月11日</div>
         </div>
       
       
@@ -410,9 +436,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" title="线程池概述">
+                      <a href="/2023/11/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%90%8C%E6%AD%A5%EF%BC%9A%E7%94%9F%E4%BA%A7%E8%80%85-%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%8E%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/" title="同步：生产者-消费者与条件变量">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">线程池概述</span>
+                        <span class="hidden-mobile">同步：生产者-消费者与条件变量</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -420,8 +446,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="硬件视角的操作系统">
-                        <span class="hidden-mobile">硬件视角的操作系统</span>
+                      <a href="/2023/11/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%B9%B6%E5%8F%91Bug%E7%9A%84%E5%BA%94%E5%AF%B9/" title="并发Bug的应对">
+                        <span class="hidden-mobile">并发Bug的应对</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
