@@ -255,15 +255,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/6.%E9%94%81/" target="_self">
-          锁的实现
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9016-Put%E5%92%8CDelete%E5%92%8CGet/" target="_self">
+          LevelDB源码分析16-Put&amp;&amp;Delete&amp;&amp;Get
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/6.%E9%94%81/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9016-Put%E5%92%8CDelete%E5%92%8CGet/" target="_self">
         <div>
-          自旋锁（Spin lock）的实现 什么是自旋锁自旋锁是一种忙等待的锁机制。锁的特性就是只有一个进程可以获取锁，在任何时间点都不能有超过一个锁的持有者。在acquire里面有一个死循环，循环中判断锁对象的locked字段是否为0，如果为0那表明当前锁没有持有者，当前对于acquire的调用可以获取锁。之后我们通过设置锁对象的locked字段为1来获取锁。最后返回。   但两个进程可能同时读到 lo
+          Put &amp;&amp; Delete &amp;&amp; Get这篇文章主要介绍一下leveldb中Put 和Delete 的接口。而Write接口用来批量执行Put或Delete操作，在同一批（即同一个WriteBatch）中的操作，其插入的entry的SequenceNumber相同。 1234567891011Status DB::Put(const WriteOptions&amp
         </div>
       </a>
 
@@ -271,358 +271,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-13 12:34" pubdate>
-              2023-08-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/8.sleep&amp;wakeup/" target="_self">
-          sleep&amp;wakeup
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/8.sleep&amp;wakeup/" target="_self">
-        <div>
-          Sleep &amp; wakeupsleep是当一个进程在等待某一个事件时陷入休眠状态，当这个事件发生时另外一个进程唤醒它。陷入休眠状态可以让这个进程不在等待的时候占用CPU资源 sleep(chan)让这个进程睡眠在chan这个wait channel上，wakeup(chan)将所有睡眠在chan上的进程全部唤醒。 lost wake-up problem：当一个进程A即将睡眠时，另外一个进
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-13 12:20" pubdate>
-              2023-08-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/4.%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
-          系统调用和trap
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/4.%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
-        <div>
-          简单介绍这篇笔记主要帮助回顾xv6是如何经过trap陷入到内核去的，介绍相关的代码的重要的细节。  重要的寄存器   SATP（Supervisor Address Translation and Protection）：它包含了指向page table的物理内存地址 STVEC（Supervisor Trap Vector Base Address Register）：它指向了内核中处理trap
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-12 18:26" pubdate>
-              2023-08-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/7.%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2/" target="_self">
-          线程切换
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/7.%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2/" target="_self">
-        <div>
-          xv6中的线程一个线程可以认为是串行执行代码的单元。  内核线程的概念，对于每个用户进程都有一个内核线程来执行来自用户进程的系统调用。所有的内核线程都共享了内核内存，所以XV6的内核线程的确会共享内存。 每一个用户进程都有独立的内存地址空间，并且包含了一个线程，这个线程控制了用户进程代码指令的执行。所以XV6中的用户线程之间没有共享内存，你可以有多个用户进程，但是每个用户进程都是拥有一个线程的独立
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-12 18:01" pubdate>
-              2023-08-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/08/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/9.%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
-          文件系统层级结构
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/08/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/9.%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
-        <div>
-          1.文件系统组织架构  disk层：对硬盘上的块进行读写操作  buffer cache层：在内存中对磁盘块进行缓存，并确保只有1个内核进程能在一段时间内修改文件块上存储的数据。  logging层：让更高的层级能够将对文件块的所有update打包到一个transaction中，从而能保证所有文件块能够在将要崩溃时原子地进行update  inode层：为每个文件提供独一无二的inode numb
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-08 10:40" pubdate>
-              2023-08-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/06/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Project0/" target="_self">
-          CMU_15445：Project C++ Primer
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/06/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Project0/" target="_self">
-        <div>
-          前置知识书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。 左值引用和右值引用 左值是可以放在赋值号左边的，左值必须要在内存中有实体。 右值出现在赋值号右边；右值可以在寄存器也可以在内存中。  123int num = 10;int &amp;b = num;int &amp;c = 10; // 错误 上面。n
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-06 11:19" pubdate>
-              2023-08-06
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
             </time>
           </div>
         
@@ -642,7 +292,7 @@
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
   
   
 
@@ -661,7 +311,7 @@
             
               <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/CMU-15445/">#CMU_15445</a>
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
             
           </div>
         
@@ -675,15 +325,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
-          线程池的C语言实现
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9014-%E5%BF%AB%E7%85%A7Snapshot/" target="_self">
+          LevelDB源码分析14-快照Snapshot
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9014-%E5%BF%AB%E7%85%A7Snapshot/" target="_self">
         <div>
-          1.任务队列线程池结构体就是存储任务队列的。很明显，任务中需要有执行函数的函数地址和传入的参数。 12345typedef struct Task&#123;    void (*function)(void *arg);    void *arg;&#125; Task; 在这里，我们的function函数只接受单个参数。  如果需要多个参数呢？我在github上给出了一小段实现代码。这是我的g
+          Snapshotsnapshot，即快照，赋予了使用者查找在过去某一个瞬间数据库状态的能力：在那一时刻，整个 leveldb 有哪些数据，什么版本。 leveldb 会冗余地存储很多旧版本的数据。我们有可能误删了数据， 或者想追踪数据的变化历史，这时快照功能就十分有用了。 实现快照功能有以下两个主要问题：  前面说过，应该冗余存储旧版本数据。那么应该保留多老的数据呢？ 联想到 leveldb 中任
         </div>
       </a>
 
@@ -691,8 +341,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-05 15:12" pubdate>
-              2023-08-05
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
             </time>
           </div>
         
@@ -707,12 +357,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
   
   
 
@@ -729,9 +379,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
             
           </div>
         
@@ -745,15 +395,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
-          线程池概述
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9015-%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/" target="_self">
+          LevelDB源码分析15-版本控制
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9015-%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/" target="_self">
         <div>
-          1.线程池的原理为什么需要线程池  并发的线程数目较多，假如每一个线程都只是执行一个时间很短的任务就结束了，那么这样频繁的创建线程就会大大降低系统的效率，因为频繁创建和销毁线程都需要时间。  线程池就是使得线程可以复用，一个线程执行完一个任务后并不销毁。线程池里的线程都是后台线程。如果某个线程在托管代码中空闲，那么线程池将插入另一个辅助线程来使所有处理器繁忙。如果线程池中的所有线程都繁忙，但队列中
+          本讲内容这篇文章主要介绍leveldb中的MVCC机制，leveldb是如何进行读读并发，读写并发以及快照读的。 LevelDB的用户可以通过其提供的接口要求其保留一定时间之前的快照，在用户释放快照前，该快照创建时LevelDB中存在的数据就不会被释放。这里主要通过Ref 和UnRef 机制实现。引用计数为0的版本可以删除，同样引用计数为0的文件也可以删除，不同的版本之间可能会有重叠的文件。 想要
         </div>
       </a>
 
@@ -761,8 +411,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-05 12:41" pubdate>
-              2023-08-05
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
             </time>
           </div>
         
@@ -777,12 +427,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
   
   
 
@@ -799,9 +449,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
             
           </div>
         
@@ -815,15 +465,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
-          硬件视角的操作系统
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9013-%E8%BF%AD%E4%BB%A3%E5%99%A8/" target="_self">
+          LevelDB源码分析13-迭代器
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9013-%E8%BF%AD%E4%BB%A3%E5%99%A8/" target="_self">
         <div>
-          本讲内容：计算机硬件的状态机模型；回答以下问题： 什么是计算机硬件？ 计算机硬件和程序员之间是如何约定的？ 听说操作系统也是程序。那到底是鸡生蛋还是蛋生鸡？  硬件与程序员的约定Bare-metal 与程序员的约定 Bare-metal 是指在没有操作系统或者其他软件支持的情况下直接运行硬件的情况。   Bare-metal 与厂商的约定  CPU Reset 后的状态 (寄存器值)
+          我们已经介绍了leveldb中基本所有组件的结构，接下来我们应该设计迭代器用来访问这些基本的组件。 本文将对LevelDB中迭代器Iterator的体系进行介绍，旨在梳理LevelDB中各种迭代器的功能与使用场景，对迭代器的实现介绍较少。迭代器的实现细节其实相对并不难。 IteratorsLevelDB中，既有直接在集合上的基本迭代器，也有对一个迭代器进行封装来解析更复杂数据的迭代器，还有多个迭代
         </div>
       </a>
 
@@ -831,8 +481,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:48" pubdate>
-              2023-08-02
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
             </time>
           </div>
         
@@ -847,12 +497,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
   
   
 
@@ -869,9 +519,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
             
           </div>
         
@@ -885,15 +535,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
-          系统调用和UNIX Shell
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9012-Compaction(2)/" target="_self">
+          LevelDB源码分析12-Compaction(2)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9012-Compaction(2)/" target="_self">
         <div>
-          本讲内容 Shell xv6 shell 代码讲解  什么是 shell os &#x3D; API + 对象 人不可能直接使用系统调用来使用操作系统，所以人和操作系统之间隔了一个应用程序，这个应用程序就叫 shell。shell 把内核的 API 和对象做一层封装，来帮助用户管理操作系统对象的一个应用程序 。有 graphic shell 和 command line shell。    she
+          Compaction上一篇介绍了Compaction的一些基本概念和原理，这一篇，我们开始研究Compaction中的代码，力求清楚代码中的细节。 Minor CompactionMinor Compaction主要通过DBImpl::CompactionMemTable方法实现： CompactionMemTable方法首先调用DBImpl::WriteLevel0Table方法将Immutab
         </div>
       </a>
 
@@ -901,8 +551,321 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+            
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%901-%E6%80%BB%E4%BD%93%E4%BB%8B%E7%BB%8D/" target="_self">
+          LevelDB源码分析1-总体介绍
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%901-%E6%80%BB%E4%BD%93%E4%BB%8B%E7%BB%8D/" target="_self">
+        <div>
+          总体介绍LSM-TreeLog Structured Merge Tree，简称 LSM-Tree。LSM-Tree 通过将磁盘的随机写转化为顺序写来提高写性能 ，而付出的代价就是牺牲部分读性能、写放大。 如何优化写性能？Append only：所有写操作都是将数据添加到文件末尾。缺点是不支持有序遍历、需要垃圾回收 ** 如何优化读性能**有序和哈希 读写性能的权衡如何获得接近 append on
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+            
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9010-Cache/" target="_self">
+          LevelDB源码分析10-Cache
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9010-Cache/" target="_self">
+        <div>
+          ** Leveldb中的缓存机制**这篇文章将讲解LevelDB缓存模块的相关内容，本文内容比较简单，读者只需按照顺序阅读即可。 leveldb中的缓存分为两种:  sstable的table_cache_ (类DBImpl 中) Block的block_cache_ (可选，在options 中)  sstable的Cache就是缓存(Key:file_number    Value:Table
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+            
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9011-Compaction(1)/" target="_self">
+          LevelDB源码分析11-Compaction(1)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9011-Compaction(1)/" target="_self">
+        <div>
+          Compaction 的作用因为 LevelDB 的增删改都是通过追加写来实现的，所以需要通过后台线程的 compaction 来：  清理过期（旧版本或者已删除）的数据。 维护数据的有序性。  Compaction 的触发除了从外部调用 CompactRange，LevelDB 有几种情况会自动触发 compaction：  当 MemTable 的大小达到阈值时，进行 MemTable 切换，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-26 17:53" pubdate>
+              2024-02-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+            
+              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/01/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/Transformation(1)/" target="_self">
+          
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/01/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/Transformation(1)/" target="_self">
+        <div>
+          Transformation变换(1)1.基础变换引入齐次坐标，对于二维平面：点 (x, y) ，其齐次坐标为：(x, y ,1)向量(x, y)，其齐次坐标为：(x, y, 0)可以保证加减性质不变：  想一想：点 + 点表示的是上面：  表示的是两个点连线的中点、  1.1 缩放  1.2旋转  1.3平移  1.4仿射变换仿射变换 &#x3D; 线性变换 + 平移变换  1.5复合变换多个简
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-01-26 16:03" pubdate>
+              2024-01-26
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/11/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%90%8C%E6%AD%A5%EF%BC%9A%E4%BF%A1%E5%8F%B7%E9%87%8F/" target="_self">
+          同步：信号量
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/11/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%90%8C%E6%AD%A5%EF%BC%9A%E4%BF%A1%E5%8F%B7%E9%87%8F/" target="_self">
+        <div>
+          本讲内容：另一种共享内存系统中常用的同步方法：信号量 什么是信号量 信号量适合解决什么问题 哲 ♂ 学家吃饭问题  什么是信号量在操作系统中，信号量就是一个变量（可以是整数或复杂的记录型变量），用来表示系统中某种资源的数量。 Linux中的信号量 P操作：尝试在盒子中拿一个球，若盒子中没有球，则睡眠；否则就可以进入临界区。 V操作：尝试在盒子中放入一个球，若盒子已满，则睡眠；放入成功后，可唤醒在这
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-11-11 12:32" pubdate>
+              2023-11-11
             </time>
           </div>
         
@@ -953,7 +916,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

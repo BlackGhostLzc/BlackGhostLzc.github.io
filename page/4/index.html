@@ -255,15 +255,575 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/fork%E7%9A%84%E5%BA%94%E7%94%A8/" target="_self">
-          fork的应用
+        <a href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/8.sleep&amp;wakeup/" target="_self">
+          sleep&amp;wakeup
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/fork%E7%9A%84%E5%BA%94%E7%94%A8/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/8.sleep&amp;wakeup/" target="_self">
         <div>
-          复习 fork状态机复制，包括持有的所有操作系统对象(如文件描述符) execve重置状态机，但继承持有的所有操作系统的对象 例如在fork之前打开一个管道, 然后就可以把一部分计算的输出管道给另外一个进程的输入  文件描述符1int open(const char *pathname, int flags);   RTFM: O_CLOEXEC : execve时文件描述符不应该被继承； O_A
+          Sleep &amp; wakeupsleep是当一个进程在等待某一个事件时陷入休眠状态，当这个事件发生时另外一个进程唤醒它。陷入休眠状态可以让这个进程不在等待的时候占用CPU资源 sleep(chan)让这个进程睡眠在chan这个wait channel上，wakeup(chan)将所有睡眠在chan上的进程全部唤醒。 lost wake-up problem：当一个进程A即将睡眠时，另外一个进
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-13 12:20" pubdate>
+              2023-08-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/4.%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
+          系统调用和trap
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/4.%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
+        <div>
+          简单介绍这篇笔记主要帮助回顾xv6是如何经过trap陷入到内核去的，介绍相关的代码的重要的细节。  重要的寄存器   SATP（Supervisor Address Translation and Protection）：它包含了指向page table的物理内存地址 STVEC（Supervisor Trap Vector Base Address Register）：它指向了内核中处理trap
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-12 18:26" pubdate>
+              2023-08-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/7.%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2/" target="_self">
+          线程切换
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/12/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/7.%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2/" target="_self">
+        <div>
+          xv6中的线程一个线程可以认为是串行执行代码的单元。  内核线程的概念，对于每个用户进程都有一个内核线程来执行来自用户进程的系统调用。所有的内核线程都共享了内核内存，所以XV6的内核线程的确会共享内存。 每一个用户进程都有独立的内存地址空间，并且包含了一个线程，这个线程控制了用户进程代码指令的执行。所以XV6中的用户线程之间没有共享内存，你可以有多个用户进程，但是每个用户进程都是拥有一个线程的独立
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-12 18:01" pubdate>
+              2023-08-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/08/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/9.%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
+          文件系统层级结构
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/08/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/9.%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
+        <div>
+          1.文件系统组织架构  disk层：对硬盘上的块进行读写操作  buffer cache层：在内存中对磁盘块进行缓存，并确保只有1个内核进程能在一段时间内修改文件块上存储的数据。  logging层：让更高的层级能够将对文件块的所有update打包到一个transaction中，从而能保证所有文件块能够在将要崩溃时原子地进行update  inode层：为每个文件提供独一无二的inode numb
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-08 10:40" pubdate>
+              2023-08-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6-S081/" class="category-chain-item">MIT6.S081</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/MIT6-S081/">#MIT6.S081</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/06/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Project0/" target="_self">
+          CMU_15445：Project C++ Primer
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/06/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Project0/" target="_self">
+        <div>
+          前置知识书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。 左值引用和右值引用 左值是可以放在赋值号左边的，左值必须要在内存中有实体。 右值出现在赋值号右边；右值可以在寄存器也可以在内存中。  123int num = 10;int &amp;b = num;int &amp;c = 10; // 错误 上面。n
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-06 11:19" pubdate>
+              2023-08-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+            
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          线程池的C语言实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          1.任务队列线程池结构体就是存储任务队列的。很明显，任务中需要有执行函数的函数地址和传入的参数。 12345typedef struct Task&#123;    void (*function)(void *arg);    void *arg;&#125; Task; 在这里，我们的function函数只接受单个参数。  如果需要多个参数呢？我在github上给出了一小段实现代码。这是我的g
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-05 15:12" pubdate>
+              2023-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+            
+              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
+          线程池概述
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
+        <div>
+          1.线程池的原理为什么需要线程池  并发的线程数目较多，假如每一个线程都只是执行一个时间很短的任务就结束了，那么这样频繁的创建线程就会大大降低系统的效率，因为频繁创建和销毁线程都需要时间。  线程池就是使得线程可以复用，一个线程执行完一个任务后并不销毁。线程池里的线程都是后台线程。如果某个线程在托管代码中空闲，那么线程池将插入另一个辅助线程来使所有处理器繁忙。如果线程池中的所有线程都繁忙，但队列中
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-05 12:41" pubdate>
+              2023-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+            
+              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
+          硬件视角的操作系统
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
+        <div>
+          本讲内容：计算机硬件的状态机模型；回答以下问题： 什么是计算机硬件？ 计算机硬件和程序员之间是如何约定的？ 听说操作系统也是程序。那到底是鸡生蛋还是蛋生鸡？  硬件与程序员的约定Bare-metal 与程序员的约定 Bare-metal 是指在没有操作系统或者其他软件支持的情况下直接运行硬件的情况。   Bare-metal 与厂商的约定  CPU Reset 后的状态 (寄存器值)
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:48" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
+          系统调用和UNIX Shell
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
+        <div>
+          本讲内容 Shell xv6 shell 代码讲解  什么是 shell os &#x3D; API + 对象 人不可能直接使用系统调用来使用操作系统，所以人和操作系统之间隔了一个应用程序，这个应用程序就叫 shell。shell 把内核的 API 和对象做一层封装，来帮助用户管理操作系统对象的一个应用程序 。有 graphic shell 和 command line shell。    she
         </div>
       </a>
 
@@ -325,15 +885,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/C%E6%A0%87%E5%87%86%E5%BA%93%E5%92%8C%E5%AE%9E%E7%8E%B0/" target="_self">
-          C标准库和实现
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B/" target="_self">
+          输入输出设备模型
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/C%E6%A0%87%E5%87%86%E5%BA%93%E5%92%8C%E5%AE%9E%E7%8E%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B/" target="_self">
         <div>
-          我们该如何学习 C 标准库? 直接调试 glibc (像我们上课那样) 寻找更好的替代品，一定有为嵌入式设备实现的简化 libc。 选择 muslmusl是一个轻量级的C标准库，它专注于提供高效、可靠和安全的C语言运行时环境。musl库的设计目标是遵循POSIX标准，同时保持代码的简洁和易于维护。它主要用于嵌入式系统、轻量级容器和其他类似的应用程序中，因为它比其他标准库更小、更快、更安全，并且不包
+          IO设备(CPU视角)：一个能与CPU交换数据的接口&#x2F;控制器 就是“几组约定好功能的线”，通过握手信号从线上读出&#x2F;写入数据 每一组线都有自己的地址 CPU可以直接使用指令(in&#x2F;out&#x2F;MMIO)和设备交换数据CPU不管设备具体是如何实现的    总线、中断控制器和DMA越来越多的IO设备，如何给未来留出一点空间？  CPU只直接连接一个设备，这个IO设备实
         </div>
       </a>
 
@@ -342,76 +902,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%BA%94%E7%94%A8%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
-          应用视角的操作系统
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%BA%94%E7%94%A8%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
-        <div>
-          本讲内容：指令序列和高级语言的状态机模型；回答以下问题： 什么是软件 (程序)？ 如何在操作系统上构造最小&#x2F;一般&#x2F;图形界面应用程序？ 什么是编译器？编译器把一段程序翻译成什么样的指令序列才算 “正确”？  构建一个最小的程序12345#include&lt;stdio.h&gt;int main()&#123;	printf(&quot;Hello World\n&quot;)
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 22:20" pubdate>
               2023-08-02
             </time>
           </div>
@@ -463,7 +953,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span>
+      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/5/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

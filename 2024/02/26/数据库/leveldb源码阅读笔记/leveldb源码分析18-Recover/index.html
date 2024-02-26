@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Manifest文件在介绍Recover机制前，我们先要看一下leveldb中的Manifest 文件。 我们知道，每次进行Compaction生成或删除SSTable文件时，都会生成一个新的版本。LevelDB 采用了增量式的存储方式，用 VersionEdit 记录每一个 Version 对上一个 Version 的变化情况。 Manifest 文件专用于记录版本信息。一个 Manifest">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LevelDB源码分析18-Recover">
+<meta property="og:url" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9018-Recover/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="Manifest文件在介绍Recover机制前，我们先要看一下leveldb中的Manifest 文件。 我们知道，每次进行Compaction生成或删除SSTable文件时，都会生成一个新的版本。LevelDB 采用了增量式的存储方式，用 VersionEdit 记录每一个 Version 对上一个 Version 的变化情况。 Manifest 文件专用于记录版本信息。一个 Manifest">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-26T09:53:35.205Z">
+<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="LevelDB源码分析">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>LevelDB源码分析18-Recover - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LevelDB源码分析18-Recover"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-26 17:53" pubdate>
+          2024年2月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LevelDB源码分析18-Recover</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Manifest文件"><a href="#Manifest文件" class="headerlink" title="Manifest文件"></a><strong>Manifest文件</strong></h2><p>在介绍Recover机制前，我们先要看一下leveldb中的<code>Manifest</code> 文件。</p>
+<p>我们知道，每次进行Compaction生成或删除SSTable文件时，都会生成一个新的版本。LevelDB 采用了增量式的存储方式，用 VersionEdit 记录每一个 Version 对上一个 Version 的变化情况。</p>
+<p>Manifest 文件专用于记录版本信息。一个 Manifest 文件中，包含了多条Session Record。一个 Session Record 记录了从上一个版本至该版本的变化情况。每一个 Session Record 对应一个 VersionEdit，不断调用<code>Apply</code> 函数最终可以得到最新的版本信息。</p>
+<p>问题：那么这样是不是会出现Manifest文件过大的问题呢？</p>
+<blockquote>
+<p>其中第一条 Session Record 包含当时LevelDB的全量版本信息。这是压缩Manifest文件的方式。</p>
+</blockquote>
+<p><code>descriptor_log_</code> 就是Manifest文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">descriptor_log_ = new <span class="hljs-built_in">log</span>::Writer(descriptor_file_, manifest_size);<br></code></pre></td></tr></table></figure>
+
+
+
+<p>在第一次执行<code>LogAndApply</code> 函数（这个函数接受一个 VersionEdit，产生一个新的 Version）的时候，如果没有<code>descriptor_log_</code> 这个文件，那么就需要把当前版本的全量版本信息写入Manifest文件(这是上面替代的压缩Mainifest的方式)</p>
+<blockquote>
+<p>有一个参数<code>save_manifest</code> 就是判断这一方面逻辑的。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// LogAndApply 函数</span><br><span class="hljs-keyword">if</span> (descriptor_log_ == nullptr) &#123;<br>    <span class="hljs-comment">// No reason to unlock *mu here since we only hit this path in the</span><br>    <span class="hljs-comment">// first call to LogAndApply (when opening the database).</span><br>    assert(descriptor_file_ == nullptr);<br>    new_manifest_file = DescriptorFileName(dbname_, manifest_file_number_);<br>    s = env_-&gt;NewWritableFile(new_manifest_file, &amp;descriptor_file_);<br>    <span class="hljs-keyword">if</span> (s.ok()) &#123;<br>      descriptor_log_ = new <span class="hljs-built_in">log</span>::Writer(descriptor_file_);<br>      s = WriteSnapshot(descriptor_log_);<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>其中<code>WriteSnapshot</code> 函数就是把当前版本<code>version_</code> 以 log 形式写入Manifest文件。</p>
+<p>那么既然需要Manifest文件才可以恢复数据库，那么刚<code>DB::Open</code> 的时候，如何知道Manifest文件的路径呢？</p>
+<blockquote>
+<p>有一个文件叫做CURRENT，里面存放了Manifest文件的路径。</p>
+</blockquote>
+<h2 id="Recover机制"><a href="#Recover机制" class="headerlink" title="Recover机制"></a><strong>Recover机制</strong></h2><p>当我们打开一个数据库的时候，我们需要考虑一些什么，怎么样才能恢复到数据库原来的状态呢？</p>
+<ol>
+<li>首先需要恢复到原来的<code>version</code> 版本  (Manifest文件)</li>
+<li>然后需要恢复没写入磁盘的内存中的<code>memtable</code> (WAL的log文件)</li>
+</ol>
+<p>理清了Recover的逻辑，我们先看如何恢复到最新的Version版本。</p>
+<p><code>DBImpl::Recover -&gt; VersionSet::Recover</code>  ，主要逻辑在<code>VersionSet::Recover</code> 中，主要逻辑就是不断获取Manifest中的<code>VersionEdit</code> ，然后不断<code>Apply</code> 到<code>builder</code> 中得到最新的version。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">log</span>::Reader <span class="hljs-title function_">reader</span><span class="hljs-params">(file, &amp;reporter, <span class="hljs-literal">true</span> <span class="hljs-comment">/*checksum*/</span>,</span><br><span class="hljs-params">                       <span class="hljs-number">0</span> <span class="hljs-comment">/*initial_offset*/</span>)</span>;<br>    Slice record;<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> scratch;<br>    <span class="hljs-keyword">while</span> (reader.ReadRecord(&amp;record, &amp;scratch) &amp;&amp; s.ok()) &#123;<br>      ++read_records;<br>      VersionEdit edit;<br>      s = edit.DecodeFrom(record);<br>      <span class="hljs-keyword">if</span> (s.ok()) &#123;<br>        <span class="hljs-keyword">if</span> (edit.has_comparator_ &amp;&amp;<br>            edit.comparator_ != icmp_.user_comparator()-&gt;Name()) &#123;<br>          s = Status::InvalidArgument(<br>              edit.comparator_ + <span class="hljs-string">&quot; does not match existing comparator &quot;</span>,<br>              icmp_.user_comparator()-&gt;Name());<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (s.ok()) &#123;<br>        builder.Apply(&amp;edit);<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (edit.has_log_number_) &#123;<br>        log_number = edit.log_number_;<br>        have_log_number = <span class="hljs-literal">true</span>;<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (edit.has_prev_log_number_) &#123;<br>        prev_log_number = edit.prev_log_number_;<br>        have_prev_log_number = <span class="hljs-literal">true</span>;<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (edit.has_next_file_number_) &#123;<br>        next_file = edit.next_file_number_;<br>        have_next_file = <span class="hljs-literal">true</span>;<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (edit.has_last_sequence_) &#123;<br>        last_sequence = edit.last_sequence_;<br>        have_last_sequence = <span class="hljs-literal">true</span>;<br>      &#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>然后就开始恢复<code>memtable</code> ，要恢复哪一些日志文件呢？</p>
+<ol>
+<li>首先获取该版本的所有文件，筛选出所有的Log文件(number &gt;&#x3D; min_log)</li>
+<li>把所有Log文件进行排序，再对所有文件进行<code>RecoverLogFile</code> 恢复日志</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; filenames.size(); i++) &#123;<br>    <span class="hljs-keyword">if</span> (ParseFileName(filenames[i], &amp;number, &amp;type)) &#123;<br>      expected.erase(number);<br>      <span class="hljs-keyword">if</span> (type == kLogFile &amp;&amp; ((number &gt;= min_log) || (number == prev_log)))<br>        logs.push_back(number);<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">if</span> (!expected.empty()) &#123;<br>    <span class="hljs-type">char</span> buf[<span class="hljs-number">50</span>];<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">snprintf</span>(buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-string">&quot;%d missing files; e.g.&quot;</span>,<br>                  static_cast&lt;<span class="hljs-type">int</span>&gt;(expected.size()));<br>    <span class="hljs-keyword">return</span> Status::Corruption(buf, TableFileName(dbname_, *(expected.begin())));<br>  &#125;<br><br>  <span class="hljs-comment">// Recover in the order in which the logs were generated</span><br>  <span class="hljs-built_in">std</span>::sort(logs.begin(), logs.end());<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; logs.size(); i++) &#123;<br>    s = RecoverLogFile(logs[i], (i == logs.size() - <span class="hljs-number">1</span>), save_manifest, edit,<br>                       &amp;max_sequence);<br>    <span class="hljs-keyword">if</span> (!s.ok()) &#123;<br>      <span class="hljs-keyword">return</span> s;<br>    &#125;<br>    versions_-&gt;MarkFileNumberUsed(logs[i]);<br>  &#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="print-no-link">#LevelDB源码分析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LevelDB源码分析18-Recover</div>
+      <div>http://example.com/2024/02/26/数据库/leveldb源码阅读笔记/leveldb源码分析18-Recover/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%902-%E7%BC%96%E7%A0%81/" title="LevelDB源码分析2-编码">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LevelDB源码分析2-编码</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9017-WAL%E6%9C%BA%E5%88%B6/" title="LevelDB源码分析17-WAL机制">
+                        <span class="hidden-mobile">LevelDB源码分析17-WAL机制</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,788 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Compaction上一篇介绍了Compaction的一些基本概念和原理，这一篇，我们开始研究Compaction中的代码，力求清楚代码中的细节。 Minor CompactionMinor Compaction主要通过DBImpl::CompactionMemTable方法实现： CompactionMemTable方法首先调用DBImpl::WriteLevel0Table方法将Immutab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LevelDB源码分析12-Compaction(2)">
+<meta property="og:url" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9012-Compaction(2)/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="Compaction上一篇介绍了Compaction的一些基本概念和原理，这一篇，我们开始研究Compaction中的代码，力求清楚代码中的细节。 Minor CompactionMinor Compaction主要通过DBImpl::CompactionMemTable方法实现： CompactionMemTable方法首先调用DBImpl::WriteLevel0Table方法将Immutab">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-26T09:53:35.151Z">
+<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="LevelDB源码分析">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>LevelDB源码分析12-Compaction(2) - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LevelDB源码分析12-Compaction(2)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-26 17:53" pubdate>
+          2024年2月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          84 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LevelDB源码分析12-Compaction(2)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Compaction"><a href="#Compaction" class="headerlink" title="Compaction"></a><strong>Compaction</strong></h2><p>上一篇介绍了Compaction的一些基本概念和原理，这一篇，我们开始研究Compaction中的代码，力求清楚代码中的细节。</p>
+<h2 id="Minor-Compaction"><a href="#Minor-Compaction" class="headerlink" title="Minor Compaction"></a><strong>Minor Compaction</strong></h2><p>Minor Compaction主要通过<code>DBImpl::CompactionMemTable</code>方法实现：</p>
+<p><code>CompactionMemTable</code>方法首先调用<code>DBImpl::WriteLevel0Table</code>方法将Immutable MemTable转储为SSTable，由于该方法需要使用当前的Version信息，因此在调用前后增减了当前Version的引用计数以避免其被回收。接着，通过<code>VersionSet::LogAndApply</code>方法将增量的版本更新VersionEdit写入Manifest（其中prev log number已被弃用，不需要再关注）。如果上述操作都成功完成，则可以释放对Immutable MemTable的引用，并通过<code>RemoveObsoleteFiles</code>方法回收不再需要保留的文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">DBImpl::CompactMemTable</span><span class="hljs-params">()</span> &#123;<br>  mutex_.AssertHeld();<br>  assert(imm_ != nullptr);<br><br>  <span class="hljs-comment">// Save the contents of the memtable as a new Table</span><br>  VersionEdit edit;<br>  Version* base = versions_-&gt;current();<br>  base-&gt;Ref();<br>  Status s = WriteLevel0Table(imm_, &amp;edit, base);<br>  base-&gt;Unref();<br><br>  <span class="hljs-keyword">if</span> (s.ok() &amp;&amp; shutting_down_.load(<span class="hljs-built_in">std</span>::memory_order_acquire)) &#123;<br>    s = Status::IOError(<span class="hljs-string">&quot;Deleting DB during memtable compaction&quot;</span>);<br>  &#125;<br><br>  <span class="hljs-comment">// Replace immutable memtable with the generated Table</span><br>  <span class="hljs-keyword">if</span> (s.ok()) &#123;<br>    edit.SetPrevLogNumber(<span class="hljs-number">0</span>);<br>    edit.SetLogNumber(logfile_number_);  <span class="hljs-comment">// Earlier logs no longer needed</span><br>    s = versions_-&gt;LogAndApply(&amp;edit, &amp;mutex_);<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (s.ok()) &#123;<br>    <span class="hljs-comment">// Commit to the new state</span><br>    imm_-&gt;Unref();<br>    imm_ = nullptr;<br>    has_imm_.store(<span class="hljs-literal">false</span>, <span class="hljs-built_in">std</span>::memory_order_release);<br>    RemoveObsoleteFiles();<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    RecordBackgroundError(s);<br>  &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>接下来看一下<code>WriteLevel0Table</code> 的代码。</p>
+<p>实现也比较简单，获取了需要转储的MemTable的迭代器，并传给<code>BuildTable</code>方法。<code>BuildTable</code>方法会通过<code>TableBuilder</code>来构造SSTable文件然后写入。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs c">Status <span class="hljs-title function_">DBImpl::WriteLevel0Table</span><span class="hljs-params">(MemTable* mem, VersionEdit* edit,</span><br><span class="hljs-params">                                Version* base)</span> &#123;<br>  mutex_.AssertHeld();<br>  <span class="hljs-type">const</span> <span class="hljs-type">uint64_t</span> start_micros = env_-&gt;NowMicros();<br>  FileMetaData meta;<br>  meta.number = versions_-&gt;NewFileNumber();<br>  pending_outputs_.insert(meta.number);<br>  Iterator* iter = mem-&gt;NewIterator();<br>  Log(options_.info_log, <span class="hljs-string">&quot;Level-0 table #%llu: started&quot;</span>,<br>      (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span>)meta.number);<br><br>  Status s;<br>  &#123;<br>    mutex_.Unlock();<br>    s = BuildTable(dbname_, env_, options_, table_cache_, iter, &amp;meta);<br>    mutex_.Lock();<br>  &#125;<br><br>  Log(options_.info_log, <span class="hljs-string">&quot;Level-0 table #%llu: %lld bytes %s&quot;</span>,<br>      (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span>)meta.number, (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span>)meta.file_size,<br>      s.ToString().c_str());<br>  delete iter;<br>  pending_outputs_.erase(meta.number);<br><br>  <span class="hljs-comment">// Note that if file_size is zero, the file has been deleted and</span><br>  <span class="hljs-comment">// should not be added to the manifest.</span><br>  <span class="hljs-type">int</span> level = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">if</span> (s.ok() &amp;&amp; meta.file_size &gt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-type">const</span> Slice min_user_key = meta.smallest.user_key();<br>    <span class="hljs-type">const</span> Slice max_user_key = meta.largest.user_key();<br>    <span class="hljs-keyword">if</span> (base != nullptr) &#123;<br>      level = base-&gt;PickLevelForMemTableOutput(min_user_key, max_user_key);<br>    &#125;<br>    edit-&gt;AddFile(level, meta.number, meta.file_size, meta.smallest,<br>                  meta.largest);<br>  &#125;<br><br>  CompactionStats stats;<br>  stats.micros = env_-&gt;NowMicros() - start_micros;<br>  stats.bytes_written = meta.file_size;<br>  stats_[level].Add(stats);<br>  <span class="hljs-keyword">return</span> s;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>在LST-Tree的基本概念中，Minor Compaction只需要将Immutable MemTable全量转储为SSTable，并将其推至level-0即可。而LevelDB对这一步骤进行了优化，在<code>DBImpl::WriteLevel0Table</code> 函数中，调用了<code>PickLevelForMemTableOutput</code> ,也就是Immutable MemTable全量转储为SSTable不一定处于level 0。</p>
+<p>我们来看<code>PickLevelForMemTableOutput</code> 的代码：</p>
+<ol>
+<li>目标level不能超过配置<code>config::kMaxMemCompactLevel</code>中限制的最大高度（默认为2）</li>
+<li>目标level的文件不能与该sst相重叠</li>
+<li>该sst不能与level + 1中的sst重叠得过多，计算方式<code>GetOverlappingInputs</code></li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">Version::PickLevelForMemTableOutput</span><span class="hljs-params">(<span class="hljs-type">const</span> Slice&amp; smallest_user_key,</span><br><span class="hljs-params">                                        <span class="hljs-type">const</span> Slice&amp; largest_user_key)</span> &#123;<br>  <span class="hljs-type">int</span> level = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">if</span> (!OverlapInLevel(<span class="hljs-number">0</span>, &amp;smallest_user_key, &amp;largest_user_key)) &#123;<br>    <span class="hljs-comment">// Push to next level if there is no overlap in next level,</span><br>    <span class="hljs-comment">// and the #bytes overlapping in the level after that are limited.</span><br>    InternalKey <span class="hljs-title function_">start</span><span class="hljs-params">(smallest_user_key, kMaxSequenceNumber, kValueTypeForSeek)</span>;<br>    InternalKey <span class="hljs-title function_">limit</span><span class="hljs-params">(largest_user_key, <span class="hljs-number">0</span>, static_cast&lt;ValueType&gt;(<span class="hljs-number">0</span>))</span>;<br>    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;FileMetaData*&gt; overlaps;<br>    <span class="hljs-keyword">while</span> (level &lt; config::kMaxMemCompactLevel) &#123;<br>      <span class="hljs-keyword">if</span> (OverlapInLevel(level + <span class="hljs-number">1</span>, &amp;smallest_user_key, &amp;largest_user_key)) &#123;<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span> (level + <span class="hljs-number">2</span> &lt; config::kNumLevels) &#123;<br>        <span class="hljs-comment">// Check that file does not overlap too many grandparent bytes.</span><br>        GetOverlappingInputs(level + <span class="hljs-number">2</span>, &amp;start, &amp;limit, &amp;overlaps);<br>        <span class="hljs-type">const</span> <span class="hljs-type">int64_t</span> sum = TotalFileSize(overlaps);<br>        <span class="hljs-keyword">if</span> (sum &gt; MaxGrandParentOverlapBytes(vset_-&gt;options_)) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br>      level++;<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> level;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="Size-Compaction"><a href="#Size-Compaction" class="headerlink" title="Size Compaction"></a><strong>Size Compaction</strong></h2><p>在<code>DBImpl::BackgroundCompaction()</code> 中，如果要执行Size Compaction(或者Seek Compaction)，首先要执行<code>versions_-&gt;PickCompaction()</code> 函数，找到level层需要被合并的sst文件(1个)。</p>
+<blockquote>
+<p>注意，在Size Compaction中，对于level 0层级的合并(level 0 sst之间可能会有重叠)，输入文件可能不止1个sst文件，要添加所有与c-&gt;inputs_[0]重叠的sst作为输入文件。</p>
+</blockquote>
+<p>这里的文件是如何选取的呢？(什么依据，什么是<code>compact_pointer_</code> )</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">icmp_.Compare(f-&gt;largest.Encode(), compact_pointer_[level]) &gt; <span class="hljs-number">0</span>)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>compact_pointer_</code> 后的第一个文件作为 Compaction 对象，即本层上一次 Compaction 区间之后的文件.</p>
+</blockquote>
+<p><code>PickCompaction</code> 函数最后调用了<code>SetupOtherInputs</code> 函数，这个函数主要是找到level + 1 层级中与input的sst文件相重叠的所有sst文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs c">Compaction* <span class="hljs-title function_">VersionSet::PickCompaction</span><span class="hljs-params">()</span> &#123;<br>  Compaction* c;<br>  <span class="hljs-type">int</span> level;<br><br>  <span class="hljs-comment">// We prefer compactions triggered by too much data in a level over</span><br>  <span class="hljs-comment">// the compactions triggered by seeks.</span><br>  <span class="hljs-type">const</span> <span class="hljs-type">bool</span> size_compaction = (current_-&gt;compaction_score_ &gt;= <span class="hljs-number">1</span>);<br>  <span class="hljs-type">const</span> <span class="hljs-type">bool</span> seek_compaction = (current_-&gt;file_to_compact_ != nullptr);<br>  <span class="hljs-keyword">if</span> (size_compaction) &#123;<br>    level = current_-&gt;compaction_level_;<br>    assert(level &gt;= <span class="hljs-number">0</span>);<br>    assert(level + <span class="hljs-number">1</span> &lt; config::kNumLevels);<br>    c = new Compaction(options_, level);<br><br>    <span class="hljs-comment">// Pick the first file that comes after compact_pointer_[level]</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; current_-&gt;files_[level].size(); i++) &#123;<br>      FileMetaData* f = current_-&gt;files_[level][i];<br>      <span class="hljs-keyword">if</span> (compact_pointer_[level].empty() ||<br>          icmp_.Compare(f-&gt;largest.Encode(), compact_pointer_[level]) &gt; <span class="hljs-number">0</span>) &#123;<br>        c-&gt;inputs_[<span class="hljs-number">0</span>].push_back(f);<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (c-&gt;inputs_[<span class="hljs-number">0</span>].empty()) &#123;<br>      <span class="hljs-comment">// Wrap-around to the beginning of the key space</span><br>      c-&gt;inputs_[<span class="hljs-number">0</span>].push_back(current_-&gt;files_[level][<span class="hljs-number">0</span>]);<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (seek_compaction) &#123;<br>    level = current_-&gt;file_to_compact_level_;<br>    c = new Compaction(options_, level);<br>    c-&gt;inputs_[<span class="hljs-number">0</span>].push_back(current_-&gt;file_to_compact_);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">return</span> nullptr;<br>  &#125;<br><br>  c-&gt;input_version_ = current_;<br>  c-&gt;input_version_-&gt;Ref();<br><br>  <span class="hljs-comment">// Files in level 0 may overlap each other, so pick up all overlapping ones</span><br>  <span class="hljs-keyword">if</span> (level == <span class="hljs-number">0</span>) &#123;<br>    InternalKey smallest, largest;<br>    GetRange(c-&gt;inputs_[<span class="hljs-number">0</span>], &amp;smallest, &amp;largest);<br>    <span class="hljs-comment">// Note that the next call will discard the file we placed in</span><br>    <span class="hljs-comment">// c-&gt;inputs_[0] earlier and replace it with an overlapping set</span><br>    <span class="hljs-comment">// which will include the picked file.</span><br>    current_-&gt;GetOverlappingInputs(<span class="hljs-number">0</span>, &amp;smallest, &amp;largest, &amp;c-&gt;inputs_[<span class="hljs-number">0</span>]);<br>    assert(!c-&gt;inputs_[<span class="hljs-number">0</span>].empty());<br>  &#125;<br><br>  SetupOtherInputs(c);<br><br>  <span class="hljs-keyword">return</span> c;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在完成了<code>PickCompaction</code> 后，首先判断<code>inputs_[1]</code> 文件列表是否为空，如果为空就直接把文件移动到下一层，不需要进行多路归并的合并操作。(这段代码体现在<code>BackgroundCompaction()  c-&gt;c-&gt;IsTrivialMove()</code> 中）</p>
+<p>随后调用<code>DoCompactionWork</code> 函数。</p>
+<p>首先来看调用的是:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">Iterator* input = versions_-&gt;MakeInputIterator(compact-&gt;compaction);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c">Iterator* <span class="hljs-title function_">VersionSet::MakeInputIterator</span><span class="hljs-params">(Compaction* c)</span> &#123;<br>  ReadOptions options;<br>  options.verify_checksums = options_-&gt;paranoid_checks;<br>  options.fill_cache = <span class="hljs-literal">false</span>;<br><br>  <span class="hljs-comment">// Level-0 files have to be merged together.  For other levels,</span><br>  <span class="hljs-comment">// we will make a concatenating iterator per level.</span><br>  <span class="hljs-comment">// TODO(opt): use concatenating iterator for level-0 if there is no overlap</span><br>  <span class="hljs-type">const</span> <span class="hljs-type">int</span> space = (c-&gt;level() == <span class="hljs-number">0</span> ? c-&gt;inputs_[<span class="hljs-number">0</span>].size() + <span class="hljs-number">1</span> : <span class="hljs-number">2</span>);<br>  Iterator** <span class="hljs-built_in">list</span> = new Iterator*[space];<br>  <span class="hljs-type">int</span> num = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> which = <span class="hljs-number">0</span>; which &lt; <span class="hljs-number">2</span>; which++) &#123;<br>    <span class="hljs-keyword">if</span> (!c-&gt;inputs_[which].empty()) &#123;<br>      <span class="hljs-keyword">if</span> (c-&gt;level() + which == <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-type">const</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;FileMetaData*&gt;&amp; files = c-&gt;inputs_[which];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; files.size(); i++) &#123;<br>          <span class="hljs-built_in">list</span>[num++] = table_cache_-&gt;NewIterator(options, files[i]-&gt;number,<br>                                                  files[i]-&gt;file_size);<br>        &#125;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// Create concatenating iterator for the files from this level</span><br>        <span class="hljs-built_in">list</span>[num++] = NewTwoLevelIterator(<br>            new Version::LevelFileNumIterator(icmp_, &amp;c-&gt;inputs_[which]),<br>            &amp;GetFileIterator, table_cache_, options);<br>      &#125;<br>    &#125;<br>  &#125;<br>  assert(num &lt;= space);<br>  Iterator* result = NewMergingIterator(&amp;icmp_, <span class="hljs-built_in">list</span>, num);<br>  delete[] <span class="hljs-built_in">list</span>;<br>  <span class="hljs-keyword">return</span> result;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>MakeInputIterator</code> 返回的是MergeIterator，包含了对<code>c-&gt;inputs_</code>两层文件的迭代器。<br>它的实现也相当值的研究，首先，如果是level 0层级的sstable，由于不同sst之间可能存在着重叠，所以每一个sst都需要一个迭代器；而对于level &gt; 0层级的sst，由于整体文件是有序的，所以只需要一个迭代器。关于迭代器的结构下面会进行讲解。</p>
+<p>最后返回一个<code>MergingIterator</code> ,到此，level n和 level n+1的sst文件就已经可以使用一个<strong>统一的、有序的</strong> 迭代器进行访问了。</p>
+<p>再回到<code>DoCompactionWork</code> 的代码：</p>
+<ol>
+<li>判断当前是否有需要Minor Compaction的Immutable MemTable，如果有则让出任务，先进行Minor Compaction（该过程需要加锁）。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">while</span> (input-&gt;Valid() &amp;&amp; !shutting_down_.load(<span class="hljs-built_in">std</span>::memory_order_acquire)) &#123;<br>    <span class="hljs-comment">// Prioritize immutable compaction work</span><br>    <span class="hljs-keyword">if</span> (has_imm_.load(<span class="hljs-built_in">std</span>::memory_order_relaxed)) &#123;<br>      <span class="hljs-type">const</span> <span class="hljs-type">uint64_t</span> imm_start = env_-&gt;NowMicros();<br>      mutex_.Lock();<br>      <span class="hljs-keyword">if</span> (imm_ != nullptr) &#123;<br>        CompactMemTable();<br>        <span class="hljs-comment">// Wake up MakeRoomForWrite() if necessary.</span><br>        background_work_finished_signal_.SignalAll();<br>      &#125;<br>      mutex_.Unlock();<br>      imm_micros += (env_-&gt;NowMicros() - imm_start);<br>    &#125;<br>    .................<br></code></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>通过<code>ShouldStopBefore</code>方法估算当前SSTable大小，并判断其是否超过了<code>max_file_size</code>的限制，如果超过了则通过<code>FinishCompactionOutputFile</code>完整对当前SSTable的写入。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//接上</span><br> Slice key = input-&gt;key();<br> <span class="hljs-keyword">if</span> (compact-&gt;compaction-&gt;ShouldStopBefore(key) &amp;&amp; compact-&gt;builder != nullptr) &#123;<br>     status = FinishCompactionOutputFile(compact, input);<br>     <span class="hljs-keyword">if</span> (!status.ok()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>     &#125;<br> &#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<ol start="3">
+<li><p>接下来我们就开始遍历所有需要进行合并的所有<code>InternalKey</code> ，并判断是否丢弃这个<code>InternalKey</code> ，什么情况下需要丢弃这个<code>InternalKey</code> 呢?</p>
+<p>3.1 对于多次出现的user key，我们只关心最后写入的值 or &gt;snapshot的值</p>
+<blockquote>
+<p>我们需要保留一个小于等于 snapshot 的版本(如果有的话)。也就是对于重复的key，我们只需要保存最新的(遍历到的第1个)。大于compact-&gt;smallest_snapshot的版本都需要保存。这里也就是把snapshot过低的版本(snapshot number &lt; compact-&gt;smallest_snapshot的版本)全部给删除掉。</p>
+</blockquote>
+<p>3.2 如果是删除key &amp;&amp; &lt;&#x3D; snapshot 并且 更高层没有该key，那么也可以忽略</p>
+<blockquote>
+<p>对于<code>kTypeDeletion</code>类型，虽然可以丢弃在smallest_snapshot前的key，但是还需要保证在更高的level中没有该UserKey，否则在查询时，在当前level失配后会在下层中找到该UserKey的更旧的版本。</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> drop = <span class="hljs-literal">false</span>;<br><span class="hljs-keyword">if</span> (!ParseInternalKey(key, &amp;ikey)) &#123;<br>      <span class="hljs-comment">// Do not hide error keys</span><br>      current_user_key.clear();<br>      has_current_user_key = <span class="hljs-literal">false</span>;<br>      last_sequence_for_key = kMaxSequenceNumber;<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">if</span> (!has_current_user_key ||<br>          user_comparator()-&gt;Compare(ikey.user_key, Slice(current_user_key)) !=<br>              <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// First occurrence of this user key</span><br>        current_user_key.assign(ikey.user_key.data(), ikey.user_key.size());<br>        has_current_user_key = <span class="hljs-literal">true</span>;<br>        last_sequence_for_key = kMaxSequenceNumber;<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (last_sequence_for_key &lt;= compact-&gt;smallest_snapshot) &#123;<br>        drop = <span class="hljs-literal">true</span>;  <span class="hljs-comment">// (A)</span><br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ikey.type == kTypeDeletion &amp;&amp;<br>                 ikey.sequence &lt;= compact-&gt;smallest_snapshot &amp;&amp;<br>                 compact-&gt;compaction-&gt;IsBaseLevelForKey(ikey.user_key)) &#123;<br>        drop = <span class="hljs-literal">true</span>;<br> &#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="print-no-link">#LevelDB源码分析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LevelDB源码分析12-Compaction(2)</div>
+      <div>http://example.com/2024/02/26/数据库/leveldb源码阅读笔记/leveldb源码分析12-Compaction(2)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9013-%E8%BF%AD%E4%BB%A3%E5%99%A8/" title="LevelDB源码分析13-迭代器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LevelDB源码分析13-迭代器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%901-%E6%80%BB%E4%BD%93%E4%BB%8B%E7%BB%8D/" title="LevelDB源码分析1-总体介绍">
+                        <span class="hidden-mobile">LevelDB源码分析1-总体介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

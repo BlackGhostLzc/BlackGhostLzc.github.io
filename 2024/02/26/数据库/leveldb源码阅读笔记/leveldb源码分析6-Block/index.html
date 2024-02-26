@@ -1,0 +1,761 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Block上一讲的BlockBuilder是在构建Block用到的结构体，它不提供访问元素的接口，只提供添加entry的一些接口。当我们在SST中构建好Block后，我们需要一些接口，或者是迭代器访问Block中的元素。 12345class Iter;const char* data_;size_t size_;uint32_t restart_offset_;  &#x2F;&#x2F; Offset in da">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LevelDB源码分析6-Block">
+<meta property="og:url" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%906-Block/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="Block上一讲的BlockBuilder是在构建Block用到的结构体，它不提供访问元素的接口，只提供添加entry的一些接口。当我们在SST中构建好Block后，我们需要一些接口，或者是迭代器访问Block中的元素。 12345class Iter;const char* data_;size_t size_;uint32_t restart_offset_;  &#x2F;&#x2F; Offset in da">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-26T09:53:35.238Z">
+<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="LevelDB源码分析">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>LevelDB源码分析6-Block - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LevelDB源码分析6-Block"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-26 17:53" pubdate>
+          2024年2月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          45 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LevelDB源码分析6-Block</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h2><p>上一讲的BlockBuilder是在构建Block用到的结构体，它不提供访问元素的接口，只提供添加entry的一些接口。当我们在SST中构建好Block后，我们需要一些接口，或者是迭代器访问Block中的元素。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Iter</span>;</span><br><span class="hljs-type">const</span> <span class="hljs-type">char</span>* data_;<br><span class="hljs-type">size_t</span> size_;<br><span class="hljs-type">uint32_t</span> restart_offset_;  <span class="hljs-comment">// Offset in data_ of restart array</span><br><span class="hljs-type">bool</span> owned_;               <span class="hljs-comment">// Block owns data_[]</span><br></code></pre></td></tr></table></figure>
+
+<p>其中<code>Iter</code> 是Block的迭代器，我们来看看<code>Iter</code> 是如何实现的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Block</span>:</span>:Iter : public Iterator &#123;<br> private:<br>  <span class="hljs-type">const</span> Comparator* <span class="hljs-type">const</span> comparator_;<br>  <span class="hljs-type">const</span> <span class="hljs-type">char</span>* <span class="hljs-type">const</span> data_;       <span class="hljs-comment">// underlying block contents, block的内容</span><br>  <span class="hljs-type">uint32_t</span> <span class="hljs-type">const</span> restarts_;      <span class="hljs-comment">// Offset of restart array (list of fixed32)</span><br>  <span class="hljs-type">uint32_t</span> <span class="hljs-type">const</span> num_restarts_;  <span class="hljs-comment">// Number of uint32_t entries in restart array</span><br><br>  <span class="hljs-type">uint32_t</span> current_;        <span class="hljs-comment">// current_ is offset in data_ of current entry.  &gt;= restarts_ if !Valid</span><br>  <span class="hljs-type">uint32_t</span> restart_index_;  <span class="hljs-comment">// Index of restart block in which current_ falls</span><br>  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> key_;<br>  Slice value_;<br>  Status status_;<br>....<br>....<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="迭代器访问的接口"><a href="#迭代器访问的接口" class="headerlink" title="迭代器访问的接口"></a>迭代器访问的接口</h2><h3 id="Next方法"><a href="#Next方法" class="headerlink" title="Next方法"></a>Next方法</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">Next</span><span class="hljs-params">()</span> override &#123;<br>    assert(Valid());<br>    ParseNextKey();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">ParseNextKey</span><span class="hljs-params">()</span> &#123;<br>    current_ = NextEntryOffset();<br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* p = data_ + current_;<br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* limit = data_ + restarts_;  <span class="hljs-comment">// Restarts come right after data</span><br>    <span class="hljs-keyword">if</span> (p &gt;= limit) &#123;<br>      <span class="hljs-comment">// No more entries to return.  Mark as invalid.</span><br>      current_ = restarts_;<br>      restart_index_ = num_restarts_;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// Decode next entry</span><br>    <span class="hljs-type">uint32_t</span> shared, non_shared, value_length;<br>    p = DecodeEntry(p, limit, &amp;shared, &amp;non_shared, &amp;value_length);<br>    <span class="hljs-keyword">if</span> (p == nullptr || key_.size() &lt; shared) &#123;<br>      CorruptionError();<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      key_.resize(shared);<br>      key_.append(p, non_shared);<br>      value_ = Slice(p + non_shared, value_length);<br>      <span class="hljs-keyword">while</span> (restart_index_ + <span class="hljs-number">1</span> &lt; num_restarts_ &amp;&amp;<br>             GetRestartPoint(restart_index_ + <span class="hljs-number">1</span>) &lt; current_) &#123;<br>        ++restart_index_;<br>      &#125;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+<p>首先来看<code>DecodeEntry</code>函数，根据上面的结构图，我们看到，首先解析出<code>shared</code> 、<code>non_shared</code> 、<code>value_length</code> 的长度，然后<code>p</code> 指针来到了<code>non_shared</code> 的 key 的部分。然后<code>key_.resize(shared);key_.append(p, non_shared);</code> 由于key是上一个key的值，<code>resize</code> 和<code>append</code> 后就变成了当前的key的值。</p>
+<p>然后我们就可以移动重启点<code>restart_index_</code> 的位置了。</p>
+<p>这一部分的代码在清楚了Block的结构之后还是很显而易见的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> <span class="hljs-type">char</span>* <span class="hljs-title function_">DecodeEntry</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* p, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* limit,</span><br><span class="hljs-params">                                      <span class="hljs-type">uint32_t</span>* shared, <span class="hljs-type">uint32_t</span>* non_shared,</span><br><span class="hljs-params">                                      <span class="hljs-type">uint32_t</span>* value_length)</span> &#123;<br>  <span class="hljs-keyword">if</span> (limit - p &lt; <span class="hljs-number">3</span>) <span class="hljs-keyword">return</span> nullptr;<br>  *shared = reinterpret_cast&lt;<span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span>*&gt;(p)[<span class="hljs-number">0</span>];<br>  *non_shared = reinterpret_cast&lt;<span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span>*&gt;(p)[<span class="hljs-number">1</span>];<br>  *value_length = reinterpret_cast&lt;<span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span>*&gt;(p)[<span class="hljs-number">2</span>];<br>  <span class="hljs-keyword">if</span> ((*shared | *non_shared | *value_length) &lt; <span class="hljs-number">128</span>) &#123;<br>    <span class="hljs-comment">// Fast path: all three values are encoded in one byte each</span><br>    p += <span class="hljs-number">3</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">if</span> ((p = GetVarint32Ptr(p, limit, shared)) == nullptr) <span class="hljs-keyword">return</span> nullptr;<br>    <span class="hljs-keyword">if</span> ((p = GetVarint32Ptr(p, limit, non_shared)) == nullptr) <span class="hljs-keyword">return</span> nullptr;<br>    <span class="hljs-keyword">if</span> ((p = GetVarint32Ptr(p, limit, value_length)) == nullptr) <span class="hljs-keyword">return</span> nullptr;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (static_cast&lt;<span class="hljs-type">uint32_t</span>&gt;(limit - p) &lt; (*non_shared + *value_length)) &#123;<br>    <span class="hljs-keyword">return</span> nullptr;<br>  &#125;<br>  <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="Prev方法"><a href="#Prev方法" class="headerlink" title="Prev方法"></a>Prev方法</h3><p>如何进行向后遍历呢？Prev操作分为两步：</p>
+<ol>
+<li>首先回到current_之前的重启点(这个重启点的offset要严格小于当前<code>current </code> 的offset)</li>
+<li><em>然后再向后直到current</em> ,(不断调用<code>ParseNextKey</code> 和 <code>NextEntryOffset</code> 函数)</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">Prev</span><span class="hljs-params">()</span> override &#123;<br>    assert(Valid());<br>    <span class="hljs-comment">// Scan backwards to a restart point before current_</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">uint32_t</span> original = current_;<br>    <span class="hljs-keyword">while</span> (GetRestartPoint(restart_index_) &gt;= original) &#123;<br>      <span class="hljs-keyword">if</span> (restart_index_ == <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// No more entries</span><br>        current_ = restarts_;<br>        restart_index_ = num_restarts_;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>      restart_index_--;<br>    &#125;<br><br>    SeekToRestartPoint(restart_index_);<br>    <span class="hljs-keyword">do</span> &#123;<br>      <span class="hljs-comment">// Loop until end of current entry hits the start of original entry</span><br>    &#125; <span class="hljs-keyword">while</span> (ParseNextKey() &amp;&amp; NextEntryOffset() &lt; original);<br>  &#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="SeekToFirst-Last函数"><a href="#SeekToFirst-Last函数" class="headerlink" title="SeekToFirst&#x2F;Last函数"></a>SeekToFirst&#x2F;Last函数</h3><p>这两个函数都很简单，借助于前面的SeekToResartPoint函数就可以完成。</p>
+<h3 id="Seek函数"><a href="#Seek函数" class="headerlink" title="Seek函数"></a>Seek函数</h3><p>跳到指定的target(Slice)，这里主要是二分查找和线性查找的思路</p>
+<ol>
+<li>找到key &lt; target的最后一个重启点，典型的二分查找算法，代码就不再贴了。</li>
+<li>找到后，跳转到重启点，其索引由left指定，这是前面二分查找到的结果。</li>
+<li>自重启点线性向下，直到遇到key&gt;&#x3D; target的k&#x2F;v对。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">Seek</span><span class="hljs-params">(<span class="hljs-type">const</span> Slice&amp; target)</span> override &#123;<br>    <span class="hljs-comment">// Binary search in restart array to find the last restart point</span><br>    <span class="hljs-comment">// with a key &lt; target</span><br>    <span class="hljs-type">uint32_t</span> left = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">uint32_t</span> right = num_restarts_ - <span class="hljs-number">1</span>;<br>    <span class="hljs-type">int</span> current_key_compare = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-keyword">if</span> (Valid()) &#123;<br>      <span class="hljs-comment">// If we&#x27;re already scanning, use the current position as a starting</span><br>      <span class="hljs-comment">// point. This is beneficial if the key we&#x27;re seeking to is ahead of the</span><br>      <span class="hljs-comment">// current position.</span><br>      current_key_compare = Compare(key_, target);<br>      <span class="hljs-keyword">if</span> (current_key_compare &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// key_ is smaller than target</span><br>        left = restart_index_;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (current_key_compare &gt; <span class="hljs-number">0</span>) &#123;<br>        right = restart_index_;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// We&#x27;re seeking to the key we&#x27;re already at.</span><br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>      <span class="hljs-type">uint32_t</span> mid = (left + right + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>;<br>      <span class="hljs-type">uint32_t</span> region_offset = GetRestartPoint(mid);<br>      <span class="hljs-type">uint32_t</span> shared, non_shared, value_length;<br>      <span class="hljs-type">const</span> <span class="hljs-type">char</span>* key_ptr =<br>          DecodeEntry(data_ + region_offset, data_ + restarts_, &amp;shared,<br>                      &amp;non_shared, &amp;value_length);<br>      <span class="hljs-keyword">if</span> (key_ptr == nullptr || (shared != <span class="hljs-number">0</span>)) &#123;<br>        CorruptionError();<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>      Slice <span class="hljs-title function_">mid_key</span><span class="hljs-params">(key_ptr, non_shared)</span>;<br>      <span class="hljs-keyword">if</span> (Compare(mid_key, target) &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// Key at &quot;mid&quot; is smaller than &quot;target&quot;.  Therefore all</span><br>        <span class="hljs-comment">// blocks before &quot;mid&quot; are uninteresting.</span><br>        left = mid;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// Key at &quot;mid&quot; is &gt;= &quot;target&quot;.  Therefore all blocks at or</span><br>        <span class="hljs-comment">// after &quot;mid&quot; are uninteresting.</span><br>        right = mid - <span class="hljs-number">1</span>;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// We might be able to use our current position within the restart block.</span><br>    <span class="hljs-comment">// This is true if we determined the key we desire is in the current block</span><br>    <span class="hljs-comment">// and is after than the current key.</span><br>    assert(current_key_compare == <span class="hljs-number">0</span> || Valid());<br>    <span class="hljs-type">bool</span> skip_seek = left == restart_index_ &amp;&amp; current_key_compare &lt; <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (!skip_seek) &#123;<br>      SeekToRestartPoint(left);<br>    &#125;<br>    <span class="hljs-comment">// Linear search (within restart block) for first key &gt;= target</span><br>    <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>      <span class="hljs-keyword">if</span> (!ParseNextKey()) &#123;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span> (Compare(key_, target) &gt;= <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="print-no-link">#LevelDB源码分析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LevelDB源码分析6-Block</div>
+      <div>http://example.com/2024/02/26/数据库/leveldb源码阅读笔记/leveldb源码分析6-Block/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%908-sstable(2)/" title="LevelDB源码分析8-SSTable(2)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LevelDB源码分析8-SSTable(2)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%904-Memtable(2)/" title="LevelDB源码分析4-Memtable(2)">
+                        <span class="hidden-mobile">LevelDB源码分析4-Memtable(2)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
