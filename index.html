@@ -255,15 +255,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%909-FilterBlock%E8%A7%A3%E6%9E%90/" target="_self">
-          LevelDB源码分析9-FilterBlock解析
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E9%A1%B5%E8%A1%A8/" target="_self">
+          页表
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%909-FilterBlock%E8%A7%A3%E6%9E%90/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E9%A1%B5%E8%A1%A8/" target="_self">
         <div>
-          为什么需要FilterBlockFilter block为SST中一个区块，filter block由多个filter组成，每个data block对应一个filter（但是一个filter可能对应多个data block）。LevelDB在进入data block中查找前会先检查filter，如果filter判断key不在，那么key一定不在这个block中，就不用进入data block查找了
+          Page Tablexv6是采用了三级页表。每一个pte页表条目都是8字节(8*512 &#x3D; 4096刚好是一个page的大小)，其中低10位表示标志位，还有44位表示PPN，因为xv6中一个页的大小为4096个字节，也就是12位，所以整个页表可以表示的物理地址范围是[0, 2^56-1]。   我们先来看walk函数：这个函数给定一个虚拟地址va和一个pagetable，也就是第一级页表
         </div>
       </a>
 
@@ -271,8 +271,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -287,12 +287,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -309,9 +309,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -325,15 +325,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%907-sstable(1)/" target="_self">
-          LevelDB源码分析7-SSTable(1)
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          管道的实现
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%907-sstable(1)/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
         <div>
-          sstable首先我们看一下sstable的结构图  文件中的k&#x2F;v对是有序存储的，并且被划分到连续排列的Data Block里面，这些Data Block从文件头开始顺序存储，Data Block的存储格式代码在block_builder.cc中；  紧跟在Data Block之后的是Meta Block，其格式代码也在block_builder.cc中；Meta Block存储的是F
+          管道的实现1int pipe(int*);  在Linux中，一切皆文件，管道也是一种文件！ 我们来看在xv6中，管道究竟是如何被实现的。我们直接来看sys_pipe函数。 我们首先获取到传进来的数组fdarray，这是数组在进程地址空间中虚拟地址，然后就调用pipealloc向向操作系统内核申请两个文件。  struct file是操作系统管理的，而文件描述符则是进程所有的。操作系统有一个fta
         </div>
       </a>
 
@@ -341,8 +341,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -357,12 +357,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -379,9 +379,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -395,15 +395,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%908-sstable(2)/" target="_self">
-          LevelDB源码分析8-SSTable(2)
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
+          文件系统的构建
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%908-sstable(2)/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
         <div>
-          sstable的遍历这一讲主要介绍是如何遍历sstable的，主要介绍迭代器部分。 首先是如何打开一个sstable文件 对于一个sstable文件，我们先读取它的Footer 。然后根据它的Footer 知道这个sstable的metaindex_handle_ 和 index_handle_ 信息，进而就可以解析整个sstable文件。 1234567891011121314151617181
+          xv6文件系统的构建我们再次回到如何通过qemu启动xv6操作系统的问题，qemu的命令是： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-
         </div>
       </a>
 
@@ -411,8 +411,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -427,12 +427,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -449,9 +449,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -465,15 +465,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%906-Block/" target="_self">
-          LevelDB源码分析6-Block
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
+          xv6的启动
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%906-Block/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
         <div>
-          Block上一讲的BlockBuilder是在构建Block用到的结构体，它不提供访问元素的接口，只提供添加entry的一些接口。当我们在SST中构建好Block后，我们需要一些接口，或者是迭代器访问Block中的元素。 12345class Iter;const char* data_;size_t size_;uint32_t restart_offset_;  // Offset in da
+          xv6启动(1)我们的xv6操作系统是运行在qemu模拟器上的，如果我想要知道究竟是如何启动这个操作系统的，那么我就要知道是如何启动qemu,并传入一些什么参数的。通过make -nB，有如下命令： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive
         </div>
       </a>
 
@@ -481,8 +481,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -497,12 +497,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -519,9 +519,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -535,15 +535,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%904-Memtable(2)/" target="_self">
-          LevelDB源码分析4-Memtable(2)
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
+          Shell
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%904-Memtable(2)/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
         <div>
-          Memtable(2)这篇文章我们开始剖析Memtable 的代码实现和核心数据结构SkipList  相较于传统的链表，跳表采取空间换时间的策略，建立多层索引，实现了查找和插入都只需要logn级别的优化。 SkipList 的结构如下所示：     SkipList的结构LevelDB 跳表代码上，主要涉及 C++11 中 atomic 标准库中新支持的几种 memory order，规定了一些
+          shell这部分的笔记主要来源于user/sh.c文件，这里面有很多代码的技巧，很值得学习。这部分主要弄清楚xv6中的shell是如何工作的。  一条完整的命令是如何开始运行的 是如何实现重定向的  （ &gt; 符号) 是如何执行管道命令的  （ | 符号） 以及List命令，后台执行等。  首先sh程序会打开三次console 文件，使得0,1,2三个文件描述符都指向console 。然后就可
         </div>
       </a>
 
@@ -551,8 +551,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -567,12 +567,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -589,9 +589,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -605,15 +605,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%905-BlockBuilder/" target="_self">
-          LevelDB源码分析5-BlockBuilder
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          Printf的实现
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%905-BlockBuilder/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
         <div>
-          BlockBuilder在讲解sstable之前，我们先来看一下Block结构体的内容。 Block由一条条的data_entry(前缀压缩)，以及重启点数组，重启点数组的大小还有5字节的crc32与一个type组成。所以我们解析一个block是很容易的。首先由于最后5个字节是crc32和type，所以可以找到重启点数组大小从而定位到重启点数组的开始位置，进而每一个data_entry都可以解析出
+          printf函数的实现在介绍printf 函数之前，我们先要来了解一下C语言里面是如何实现边长参数的。printf 正是通过变长参数来实现格式化的打印的。 C 可变参数声明方式为： 1int func (int arg1, ...);  其中... 表示可变参数列表。 请注意，函数 func() 最后一个参数写成省略号，即三个点号（**…**），省略号之前的那个参数是 int，代表了要传递的可变参
         </div>
       </a>
 
@@ -621,8 +621,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -637,12 +637,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -659,9 +659,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -675,15 +675,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%903-Memtable(1)/" target="_self">
-          LevelDB源码分析3-Memtable(1)
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
+          Fork&amp;&amp;Execve的实现
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%903-Memtable(1)/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
         <div>
-          Memtable(1)对应文件：memtable.h和memtable.cc 每个 LevelDB 实例最多会维护两个 MemTable： mem_ 和 imm_。mem_ 可以读写，imm_ 只读。 12MemTable* mem_;MemTable* imm_ GUARDED_BY(mutex_);  // Memtable being compacted LevelDB 的 MemTable
+          Fork我们来看一下fork函数是如何实现的，fork是完全把父进程的状态机复制了一份。 首先，先获取当前进行系统调用的线程，然后再allocproc申请一个新的进程。在xv6操作系统中，进程的管理是一个proc数组。 12345678910int fork(void)&#123;  int i, pid;  struct proc *np;  struct proc *p = myproc();
         </div>
       </a>
 
@@ -691,8 +691,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -707,12 +707,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
   
   
 
@@ -729,9 +729,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
             
           </div>
         
@@ -745,15 +745,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%902-%E7%BC%96%E7%A0%81/" target="_self">
-          LevelDB源码分析2-编码
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          锁的实现
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%902-%E7%BC%96%E7%A0%81/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
         <div>
-          编码Leveldb使用了很多VarInt型编码，典型的如后面将涉及到的各种key。其中的编码、解码函数分为VarInt和FixedInt两种。int32和int64操作都是类似的。 Encode FixedInt编码：直接把32位整数存储在内存中。  小端：低位放到低字节地址中，高位放在高字节地址中  1234567891011void EncodeFixed32(char* buf, uint3
+          自旋锁（Spin lock）的实现 什么是自旋锁自旋锁是一种忙等待的锁机制。锁的特性就是只有一个进程可以获取锁，在任何时间点都不能有超过一个锁的持有者。在acquire里面有一个死循环，循环中判断锁对象的locked字段是否为0，如果为0那表明当前锁没有持有者，当前对于acquire的调用可以获取锁。之后我们通过设置锁对象的locked字段为1来获取锁。最后返回。   但两个进程可能同时读到 lo
         </div>
       </a>
 
@@ -761,8 +761,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -777,12 +777,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
   
   
 
@@ -799,9 +799,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
             
           </div>
         
@@ -815,15 +815,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9018-Recover/" target="_self">
-          LevelDB源码分析18-Recover
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
+          线程切换(2)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9018-Recover/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
         <div>
-          Manifest文件在介绍Recover机制前，我们先要看一下leveldb中的Manifest 文件。 我们知道，每次进行Compaction生成或删除SSTable文件时，都会生成一个新的版本。LevelDB 采用了增量式的存储方式，用 VersionEdit 记录每一个 Version 对上一个 Version 的变化情况。 Manifest 文件专用于记录版本信息。一个 Manifest
+          线程切换过程中锁的限制 在线程切换的过程中需要一直持有p-&gt;lock  防止两个CPU核使用同一个栈运行同一个线程   XV6中，不允许进程在执行switch函数的过程中，持有任何其他的锁。  防止死锁。示例：如果xv6在内核中关闭了中断，P1的内核线程持有了p-&gt;lock以外的其他锁，这些锁可能是在使用磁盘，UART，console过程中持有的。之后内核线程在持有锁的时候，通过调用s
         </div>
       </a>
 
@@ -831,8 +831,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -847,12 +847,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
   
   
 
@@ -869,9 +869,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
             
           </div>
         
@@ -885,15 +885,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9017-WAL%E6%9C%BA%E5%88%B6/" target="_self">
-          LevelDB源码分析17-WAL机制
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
+          线程切换(1)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%9017-WAL%E6%9C%BA%E5%88%B6/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
         <div>
-          预写日志(WAL)背景LevelDB每次写key-value不会直接写到文件中，而是先暂存在Memtable中，Memtable写满后再写到文件中。如果发生故障(比如宕机)，保存在Memtable中的key-value就会全部丢失（内存是易失性存储）。所以为了保证数据的原子性和持久性，每次写key-value要预写日志，日志落盘后才会把key-value插入Memtable。日志文件和Memtab
+          xv6中的线程一个线程可以认为是串行执行代码的单元。  内核线程的概念，对于每个用户进程都有一个内核线程来执行来自用户进程的系统调用。所有的内核线程都共享了内核内存，所以XV6的内核线程的确会共享内存。 每一个用户进程都有独立的内存地址空间，并且包含了一个线程，这个线程控制了用户进程代码指令的执行。所以XV6中的用户线程之间没有共享内存，你可以有多个用户进程，但是每个用户进程都是拥有一个线程的独立
         </div>
       </a>
 
@@ -901,8 +901,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-26 17:53" pubdate>
-              2024-02-26
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
             </time>
           </div>
         
@@ -917,12 +917,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="category-chain-item">LevelDB源码分析</a>
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
   
   
 
@@ -939,9 +939,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
-              <a href="/tags/LevelDB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#LevelDB源码分析</a>
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
             
           </div>
         
@@ -953,7 +953,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
