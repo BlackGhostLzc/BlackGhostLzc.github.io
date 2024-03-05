@@ -1,0 +1,845 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="OverviewP4需要完成以下任务：  Lock Manager：锁管理器，利用 2PL 实现并发控制。支持 REPEATABLE_READ、READ_COMMITTED 和 READ_UNCOMMITTED 三种隔离级别，支持 SHARED、EXCLUSIVE、INTENTION_SHARED、INTENTION_EXCLUSIVE 和 SHARED_INTENTION_EXCLUSIVE 五">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P4实验笔记">
+<meta property="og:url" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P4%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="OverviewP4需要完成以下任务：  Lock Manager：锁管理器，利用 2PL 实现并发控制。支持 REPEATABLE_READ、READ_COMMITTED 和 READ_UNCOMMITTED 三种隔离级别，支持 SHARED、EXCLUSIVE、INTENTION_SHARED、INTENTION_EXCLUSIVE 和 SHARED_INTENTION_EXCLUSIVE 五">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-05T15:36:06.438Z">
+<meta property="article:modified_time" content="2024-03-05T15:41:34.438Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="CMU_15445">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>P4实验笔记 - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="P4实验笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-05 23:36" pubdate>
+          2024年3月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          75 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">P4实验笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a><strong>Overview</strong></h2><p>P4需要完成以下任务：</p>
+<ul>
+<li>Lock Manager：锁管理器，利用 2PL 实现并发控制。支持 <code>REPEATABLE_READ</code>、<code>READ_COMMITTED</code> 和 <code>READ_UNCOMMITTED</code> 三种隔离级别，支持 <code>SHARED</code>、<code>EXCLUSIVE</code>、<code>INTENTION_SHARED</code>、<code>INTENTION_EXCLUSIVE</code> 和 <code>SHARED_INTENTION_EXCLUSIVE</code> 五种锁，支持 table 和 row 两种锁粒度，支持锁升级。Project 4 重点部分。</li>
+<li>Deadlock Detection：死锁检测，运行在一个 background 线程，每间隔一定时间检测当前是否出现死锁，并挑选合适的事务将其 abort 以解开死锁。</li>
+<li>Concurrent Query Execution：修改之前实现的 <code>SeqScan</code>、<code>Insert</code> 和 <code>Delete</code> 算子，加上适当的锁以实现并发的查询。</li>
+</ul>
+<p>建议在阅读此文前，先看一下我的上篇文章[Bustub中的并发控制]。</p>
+<h2 id="Task-1-Lock-Manager"><a href="#Task-1-Lock-Manager" class="headerlink" title="Task-1 Lock Manager"></a><strong>Task-1 Lock Manager</strong></h2><p>大部分需要注意的内容都在 <code>lock_manager.h</code> 的 LOCK NOTE 和 UNLOCK NOTE 里了，并且我在[Bustub中的并发控制]中也简单介绍了这样做实现不同隔离机制的原理。</p>
+<p>首先理一理 Lock Manager 的结构：</p>
+<ul>
+<li><code>table_lock_map_</code>：记录 table 和与其相关锁请求的映射关系。</li>
+<li><code>row_lock_map_</code>：记录 row 和与其相关锁请求的映射关系。</li>
+</ul>
+<p>这两个 map 的值均为锁请求队列 <code>LockRequestQueue</code>：</p>
+<ul>
+<li><code>request_queue_</code>：实际存放锁请求的队列。</li>
+<li><code>cv_</code> &amp; <code>latch_</code>：条件变量和锁，配合使用可以实现经典的等待资源的模型。</li>
+<li><code>upgrading_</code>：正在此资源上尝试锁升级的事务 id。</li>
+</ul>
+<p>锁请求以 <code>LockRequest</code> 类表示：</p>
+<ul>
+<li><code>txn_id_</code>：发起此请求的事务 id。</li>
+<li><code>lock_mode_</code>：请求锁的类型。</li>
+<li><code>oid_</code>：在 table 粒度锁请求中，代表 table id。在 row 粒度锁请求中，表示 row 属于的 table 的 id。</li>
+<li><code>rid_</code>：仅在 row 粒度锁请求中有效。指 row 对应的 rid。</li>
+<li><code>granted_</code>：是否已经对此请求授予锁？</li>
+</ul>
+<p>Lock Manager处理事务发送的锁请求，并且记录锁请求的状态。授予的锁和未授予的锁请求都存在锁请求队列<code>LockRequestQueue</code>中。</p>
+<h3 id="锁升级"><a href="#锁升级" class="headerlink" title="锁升级"></a><strong>锁升级</strong></h3><p>Bustub中的锁升级是什么，为什么需要锁升级?</p>
+<p>应用场景：假设事务T1读取 table_1 的所有 Tuple，事务T2先读取 table_1 的所有 Tuple，然后执行一些别的操作(因为二阶段锁的限制这里可能并不能立马释放读锁)，再写 table_1 的一些Tuple。</p>
+<p>如果事务T2直接获取到了table_1的IX锁，那么事务T1获取table_1的S锁就会发生阻塞。我们可以有更好的解决方案，比如事务T2先给table_1上S类型锁，要写的时候再上X类型锁。这里就需要锁升级了。T2会尝试把原来的S类型锁升级为X类型的锁，它对某个资源始终最多只持有一把锁。判断是否可以进行升级需要已授予的锁是否和锁升级的类型兼容，如果不兼容就得等待。</p>
+<h3 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a><strong>Lock</strong></h3><p>接下来，我们以<code>LockTable(Transaction *txn, LockMode lock_mode, const table_oid_t &amp;oid)</code>为例，介绍一下Lock上锁的过程。</p>
+<p><strong>第一步：逻辑状态的检查</strong></p>
+<p>若 txn 处于 Abort&#x2F;Commit 状态，抛逻辑异常，不应该有这种情况出现。</p>
+<p>若 txn 处于 Shrinking 状态，则需要检查 txn 的隔离级别和当前锁请求类型，不符合要求的锁请求需要把事务状态设置成ABORT，并抛出<code>TransactionAbortException</code>的异常。</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs pf">REPEATABLE_READ:<br>   The transaction is required <span class="hljs-keyword">to</span> take <span class="hljs-literal">all</span> locks.<br>   All locks are allowed <span class="hljs-keyword">in</span> the GROWING <span class="hljs-keyword">state</span><br>   No locks are allowed <span class="hljs-keyword">in</span> the SHRINKING <span class="hljs-keyword">state</span><br><br>READ_COMMITTED:<br>   The transaction is required <span class="hljs-keyword">to</span> take <span class="hljs-literal">all</span> locks.<br>   All locks are allowed <span class="hljs-keyword">in</span> the GROWING <span class="hljs-keyword">state</span><br>   Only IS, S locks are allowed <span class="hljs-keyword">in</span> the SHRINKING <span class="hljs-keyword">state</span><br><br>READ_UNCOMMITTED:<br>   The transaction is required <span class="hljs-keyword">to</span> take only IX, X locks.<br>   X, IX locks are allowed <span class="hljs-keyword">in</span> the GROWING <span class="hljs-keyword">state</span>.<br>   S, IS, SIX locks are never allowed<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>第二步：获取相应资源的锁请求队列</strong></p>
+<p>如果是相应资源的第一个锁请求还需要创建新的锁请求队列。这里要注意加锁保护数据结构。</p>
+<p><strong>第三步：检查此锁请求是否为一次锁升级。</strong></p>
+<p>首先，记得对 queue 加锁。</p>
+<p>granted 和 waiting 的锁请求均放在同一个队列里，我们需要遍历队列查看有没有与当前事务 id（我习惯叫做 tid）相同的请求。如果存在这样的请求，则代表当前事务在此前已经得到了在此资源上的一把锁，接下来可能需要锁升级。</p>
+<blockquote>
+<p>需要注意的是，这个请求的 <code>granted_</code> 一定为 true。因为假如事务此前的请求还没有被通过，事务会被阻塞在 LockManager 中，不可能再去尝试获取另一把锁。</p>
+</blockquote>
+<p>现在我们找到了此前已经获取的锁，开始尝试锁升级。首先，判断此前授予锁类型是否与当前请求锁类型相同。若相同，则代表是一次重复的请求，直接返回。否则进行下一步检查。</p>
+<p>接下来，判断当前资源上是否有另一个事务正在尝试升级（<code>queue-&gt;upgrading_ == INVALID_TXN_ID</code>）。若有，则终止当前事务，抛出 <code>UPGRADE_CONFLICT</code> 异常。因为不允许多个事务在同一资源上同时尝试锁升级。</p>
+<ul>
+<li>为什么一个资源不允许多个事务同时进行锁升级呢?</li>
+</ul>
+<blockquote>
+<p>如果不同事务可以同时对一个资源进行锁升级，那么对于某个资源R，假如事务T1和T2都尝试(阻塞)把IS类型的锁升级为S类型(因为假设事务T3获取了SIX类型的锁所以导致阻塞这两个锁升级请求)，R的LockQueue中删除了T1和T2原来的锁请求，都插入了新升级的锁请求(等待授予，grant_为false)，因为锁升级具有最高的优先级，所以需要把请求插入到第一个grant不是true的请求的前面，但这也却导致了一个问题，如果T1先插入，T2后插入，T2的锁升级请求在T1锁升级请求的前面了，也就是说反而T2比T1具有更大的优先级了，这不符合逻辑，所以这里为了降低实现的复杂度，采用了这种粗暴的方法。但其实可以新建一个专门的锁升级队列就可以解决这个问题从而实现统一资源的不同事务的同步锁升级了。</p>
+</blockquote>
+<p><strong>第四步：将锁请求插入到队列中</strong></p>
+<p>不管是锁升级请求还是平凡的锁请求，都需要把请求添加到队列中。这里不同的是锁升级请求和平凡锁请求插入的位置不同。</p>
+<p><strong>第五步，尝试获取锁。</strong></p>
+<p>这是最后一步，也是最核心的一步，体现了 Lock Manager 的执行模型。首先，需要清楚条件变量的使用场景。</p>
+<p>这里需要使用条件变量，先给出条件变量经典的使用形式：</p>
+<p><code>wait()</code> 函数接受一个 <code>std::unique_lock&lt;std::mutex&gt;</code> 对象作为参数，该参数通常是通过调用 <code>std::unique_lock</code> 对 <code>std::mutex</code> 对象进行上锁而获得的。在调用 <code>wait()</code> 函数之前，必须先获得互斥锁，以确保在等待期间其他线程无法修改条件变量所关联的数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">std</span>::unique_lock&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title function_">lock</span><span class="hljs-params">(latch)</span>;<br><span class="hljs-keyword">while</span> (!resource) &#123;<br>    cv.wait(lock);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>条件变量与互斥锁配合使用。首先需要持有锁，并查看是否能够获取资源。这个锁与资源绑定，是用来保护资源的锁。若暂时无法获取资源，则调用条件变量的 wait 函数。调用 wait 函数后，latch 将自动<strong>释放</strong>，并且当前线程被挂起，以节省资源。这就是阻塞的过程。此外，允许有多个线程在 wait 同一个 latch。</p>
+<p>在 <code>GrantLock()</code> 中，Lock Manager 会判断是否可以满足当前锁请求。若可以满足，则返回 true，事务成功获取锁，并退出循环。若不能满足，则返回 false，事务暂时无法获取锁，在 wait 处阻塞，等待资源状态变化时被唤醒并再次判断是否能够获取锁。资源状态变化指的是什么？其他事务释放了锁。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">while</span> (!GrantLock(upgraded_lock_request, lock_request_queue)) &#123;<br>    lock_request_queue-&gt;cv_.wait(lock);<br>    <br>    <span class="hljs-keyword">if</span> (txn-&gt;GetState() == TransactionState::ABORTED) &#123;<br>      lock_request_queue-&gt;upgrading_ = INVALID_TXN_ID;<br>      lock_request_queue-&gt;request_queue_.remove(upgraded_lock_request);<br>      lock_request_queue-&gt;cv_.notify_all();<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>接下来是 <code>GrantLock()</code> 函数。在此函数中，我们需要判断当前锁请求是否能被满足。</p>
+<ol>
+<li>判断兼容性。遍历请求队列，查看当前锁请求是否与所有的已经 granted 的请求兼容。需要注意的是，在我的实现中 granted 请求不一定都在队列头部，因此需要完全遍历整条队列。锁兼容矩阵可以在 Lecture slides 中查看。若全部兼容，则通过检查。否则直接返回 false。当前请求无法被满足。</li>
+<li>判断优先级。锁请求会以严格的 FIFO 顺序依次满足。只有当前请求为请求队列中优先级最高的请求时，才允许授予锁。优先级可以这样判断：</li>
+<li>如果队列中存在锁升级请求，若锁升级请求正为当前请求，则优先级最高。否则代表其他事务正在尝试锁升级，优先级高于当前请求。</li>
+<li>若队列中不存在锁升级请求，则遍历队列。如果，当前请求是第一个 waiting 状态的请求，则代表优先级最高。如果当前请求前面还存在其他 waiting 请求，则要判断当前请求是否前面的 waiting 请求兼容。若兼容，则仍可以视为优先级最高。若存在不兼容的请求，则优先级不为最高。</li>
+</ol>
+<p><code>GrantLock</code>函数首先遍历队列中所有的<code>lock_request</code>(进入的时候已经获取了锁，<code>wait</code>被唤醒需要重新获取锁才可以继续执行)，如果这个锁请求已被授予，则需要判断当前的锁请求与这个已授予的锁请求是否是兼容的，如果不兼容直接返回false。如果遍历到第一个没有被授予的锁请求，跟进先进先出的原则，如果这个锁请求和参数<code>lock_request</code>是同一个的话，那么这个锁请求的优先级就是最高的，直接返回true，如果第一个没有被授予的锁请求不是<code>lock_request</code>的话，那么证明当前的锁请求不是优先级最高的，那么需要返回false。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">auto</span> <span class="hljs-title function_">LockManager::GrantLock</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">shared_ptr</span>&lt;LockRequest&gt; &amp;lock_request,</span><br><span class="hljs-params">                            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">shared_ptr</span>&lt;LockRequestQueue&gt; &amp;lock_request_queue)</span> -&gt; <span class="hljs-type">bool</span> &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;lrq : lock_request_queue-&gt;request_queue_) &#123;<br>    <span class="hljs-comment">// 首先判断兼容性</span><br>    <span class="hljs-keyword">if</span> (lrq-&gt;granted_ &amp;&amp; !IsLockModeCompatible(lrq-&gt;lock_mode_, lock_request-&gt;lock_mode_)) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br>    <span class="hljs-comment">// 先进先出的原则，前面存在没有授予锁的请求，直接return false</span><br>    <span class="hljs-keyword">if</span> (!lrq-&gt;granted_) &#123;<br>      <span class="hljs-keyword">if</span> (lock_request.get() != lrq.get()) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="UnLock"><a href="#UnLock" class="headerlink" title="UnLock"></a><strong>UnLock</strong></h3><p>仍以 table lock 为例。Unlock 的流程比 Lock 要简单不少。</p>
+<p>首先，由于是 table lock，在释放时需要先检查其下的所有 row lock 是否已经释放。</p>
+<p>接下来是 table lock 和 row lock 的公共步骤：</p>
+<p><strong>第一步，获取对应的 lock request queue。</strong></p>
+<p><strong>第二步，遍历请求队列，找到 unlock 对应的 granted 请求。</strong></p>
+<p>若不存在对应的请求，抛 <code>ATTEMPTED_UNLOCK_BUT_NO_LOCK_HELD</code> 异常。</p>
+<p>找到对应的请求后，根据事务的隔离级别和锁类型修改其状态。</p>
+<p>当隔离级别为 <code>REPEATABLE_READ</code> 时，S&#x2F;X 锁释放会使事务进入 Shrinking 状态。当为 <code>READ_COMMITTED</code> 时，只有 X 锁释放使事务进入 Shrinking 状态。当为 <code>READ_UNCOMMITTED</code> 时，X 锁释放使事务 Shrinking，S 锁不会出现。</p>
+<p>之后，在请求队列中 remove unlock 对应的请求，并将请求 delete。</p>
+<p>在锁成功释放后，调用 <code>cv_.notify_all()</code> 唤醒所有阻塞在此 table 上的事务，检查能够获取锁。</p>
+<h2 id="Task-2-Deadlock-Detection"><a href="#Task-2-Deadlock-Detection" class="headerlink" title="Task-2 Deadlock Detection"></a><strong>Task-2 Deadlock Detection</strong></h2><p>在前面讲过，二阶段锁协议并不保证不会出现死锁，那么我们需要进行死锁检测，如果发生了死锁，则需要终止某一个事务。</p>
+<p>在阻塞过程中有可能会出现多个事务的循环等待，而循环等待会造成死锁。在 Bustub 中我们采用一个 Background Deadlock Detection 线程来定时检查当前是否出现死锁。</p>
+<p>我们用 wait for 图来表示事务之间的等待关系。wait for 是一个有向图，<code>t1-&gt;t2</code> 即代表 t1 事务正在等待 t2 事务释放资源。当 wait for 图中存在环时，即代表出现死锁，需要挑选事务终止以打破死锁。</p>
+<p>我们并不需要时刻维护 wait for 图，而是在死锁检测线程被唤醒时，根据当前请求队列构建 wait for 图，再通过 wait for 图判断是否存在死锁。当判断完成后，将丢弃当前 wait for 图。下次线程被唤醒时再重新构建。</p>
+<p>最常见的有向图环检测算法包括 DFS 和拓扑排序。在这里我们选用 DFS 来进行环检测。构建 wait for 图时要保证搜索的确定性。始终从 tid 较小的节点开始搜索，在选择邻居时，也要优先搜索 tid 较小的邻居。</p>
+<p>构建 wait for 图的过程是，遍历 <code>table_lock_map</code> 和 <code>row_lock_map</code> 中所有的请求队列，对于每一个请求队列，用一个二重循环将所有满足等待关系的一对 tid 加入 wait for 图的边集。满足等待关系是指，对于两个事务 a 和 b，a 是 waiting 请求，b 是 granted 请求，则生成 <code>a-&gt;b</code> 一条边。</p>
+<p>构建好 wait for 图后，就可以判断有向图中是否出现了环，如果出现了环，就需要把其中最年轻的事务(<code>txn_id</code>最小)状态设置成ABORT。 </p>
+<h2 id="Task-3-Concurrent-Query-Execution"><a href="#Task-3-Concurrent-Query-Execution" class="headerlink" title="Task-3 Concurrent Query Execution"></a><strong>Task-3 Concurrent Query Execution</strong></h2><p>最后就是为Seqscan、Insert和Delete加锁实现不同的隔离级别了。</p>
+<h3 id="Seqscan"><a href="#Seqscan" class="headerlink" title="Seqscan"></a><strong>Seqscan</strong></h3><p>如果隔离级别是 <code>READ_UNCOMMITTED</code> 则无需加锁。加锁失败则抛出 <code>ExecutionException</code> 异常。</p>
+<p>在 <code>READ_COMMITTED</code> 下，在 <code>Next()</code> 函数中，若表中已经没有数据，则提前释放之前持有的锁。在 <code>REPEATABLE_READ</code> 下，在 Commit&#x2F;Abort 时统一释放，无需手动释放。</p>
+<p>那应该加什么锁呢，直观来说应该对Table加S类型的锁就行了。但如果深入了解Bustub的代码，发现直接对Table加S类型的锁是错误的，而应该对表先加IS锁，然后再在下面的tuple加S锁。</p>
+<ul>
+<li>Q1:为什么对于Seqscan，需要对表加IS锁再对tuple加S锁，为什么不能够直接对表加S锁呢？</li>
+</ul>
+<blockquote>
+<p>主要是后续可以进行一个merge filter scan的优化，把filter放进SeqScan里，这种情况下就是表IS+符合条件的行S。</p>
+<p>另外，如果直接表S的话，执行一个DELETE … WHERE …，同一个query里先在下层SeqScan加了S锁，又尝试在Delete里加IX锁，但是S不能升级为IX，会导致这条query执行不了，升级不兼容。所以还是SeqScan也用表IS+行S比较容易实现。</p>
+</blockquote>
+<ul>
+<li>Q2:在 <code>READ_COMMITTED</code> 下，在 <code>Next()</code> 函数中，若表中已经没有数据，则提前释放之前持有的锁。在 <code>REPEATABLE_READ</code> 下，在 Commit&#x2F;Abort 时统一释放，无需手动释放，为什么？</li>
+</ul>
+<blockquote>
+<p>在我的上篇文章[Bustub中的并发控制]中讲过，读未提交的Seqscan读取是不需要进行加锁的。</p>
+<p>在读已提交中，为什么要在<code>Next</code>函数中如果没有数据，释放所有的锁呢。在前面的加锁规则中我们也说到过，读已提交事务解S类型的锁并不改变二阶段封锁协议中的状态，所以这里提前释放S锁，后面就有可能再次获取这个tuple的S锁(读已提交在<code>SHRINKING</code>阶段仍可以加S锁)，这也就是为什么读已提交会出现不可重复读的问题。</p>
+<p>而可重复读的事务把所有锁的释放推到了事务提交或终止后，在读取某条tuple时，只能<code>lock-S(tuple-1) ... read(tuple1) ... read(tuple1)...unlock(tuple-1)</code>，所以就不会出现前后读取不一致的问题。</p>
+</blockquote>
+<h3 id="Insert-Delete"><a href="#Insert-Delete" class="headerlink" title="Insert &amp; Delete"></a><strong>Insert &amp; Delete</strong></h3><p>在 <code>Init()</code> 函数中，为表加上 IX 锁，再为行加 X 锁。</p>
+<h2 id="LeaderBoard-Task"><a href="#LeaderBoard-Task" class="headerlink" title="LeaderBoard Task"></a><strong>LeaderBoard Task</strong></h2><p>这里需要实现几个小优化：</p>
+<h3 id="Predicate-pushdown-to-SeqScan"><a href="#Predicate-pushdown-to-SeqScan" class="headerlink" title="Predicate pushdown to SeqScan"></a><strong>Predicate pushdown to SeqScan</strong></h3><p>这就是谓词下推到Seqscan的算子中，我们在上面已经提到了，这需要先对整张表上IS锁，再对行上S锁实现读取。</p>
+<h3 id="Update算子"><a href="#Update算子" class="headerlink" title="Update算子"></a><strong>Update算子</strong></h3><p>在了解完<code>TablePage</code>的结构和<code>MarkDelete</code>以及<code>ApplyDelete</code>函数后，我误认为Bustub貌似不能够实现Update操作，原因是Delete采用了比较取巧的行为将<code>size</code>的第32位置1，但Update后tuple原来的大小可是彻底消失了，事务Abort之后又该怎么恢复呢。可是还是证明我想错了，Bustub能够实现Update操作，主要原因就是<code>Transaction</code>维护了一个写的集合。这样做Update,Insert、Delete操作的时候都需要把这些写过的tuple记录到write set里面，方便事务Abort后进行恢复。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">auto</span> <span class="hljs-title function_">GetWriteSet</span><span class="hljs-params">()</span> -&gt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">shared_ptr</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">deque</span>&lt;TableWriteRecord&gt;&gt; &#123; <span class="hljs-keyword">return</span> table_write_set_; &#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TableWriteRecord</span> &#123;</span><br> public:<br>  TableWriteRecord(RID rid, WType wtype, <span class="hljs-type">const</span> Tuple &amp;tuple, TableHeap *table)<br>      : rid_(rid), wtype_(wtype), tuple_(tuple), table_(table) &#123;&#125;<br><br>  RID rid_;<br>  WType wtype_;<br>  <span class="hljs-comment">/** The tuple is only used for the update operation. */</span><br>  Tuple tuple_;<br>  <span class="hljs-comment">/** The table heap specifies which table this write record is for. */</span><br>  TableHeap *table_;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">TransactionManager::Abort</span><span class="hljs-params">(Transaction *txn)</span> &#123;<br>  txn-&gt;SetState(TransactionState::ABORTED);<br>  <span class="hljs-comment">// Rollback before releasing the lock.</span><br>  <span class="hljs-keyword">auto</span> table_write_set = txn-&gt;GetWriteSet();<br>  <span class="hljs-keyword">while</span> (!table_write_set-&gt;empty()) &#123;<br>    <span class="hljs-keyword">auto</span> &amp;item = table_write_set-&gt;back();<br>    <span class="hljs-keyword">auto</span> *table = item.table_;<br>    <span class="hljs-keyword">if</span> (item.wtype_ == WType::DELETE) &#123;<br>      table-&gt;RollbackDelete(item.rid_, txn);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (item.wtype_ == WType::INSERT) &#123;<br>      <span class="hljs-comment">// Note that this also releases the lock when holding the page latch.</span><br>      table-&gt;ApplyDelete(item.rid_, txn);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (item.wtype_ == WType::UPDATE) &#123;<br>      <span class="hljs-comment">// 再调用UpdateTuple函数更新回去，妙妙妙!</span><br>      table-&gt;UpdateTuple(item.tuple_, item.rid_, txn);<br>    &#125;<br>    table_write_set-&gt;pop_back();<br>  &#125;<br>  table_write_set-&gt;clear();<br>    <br>  ........<br>  <span class="hljs-comment">// 接下来可能还需要恢复索引呢</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>Update算子的实现就很清楚了，首先为整张表上一把IX类型的锁，然后再对要更新的tuple加上X锁，但不立马释放，等到事务结束的时候统一释放(所以每一个事务都有表锁集合和行锁集合)。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/CMU-15445/" class="print-no-link">#CMU_15445</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>P4实验笔记</div>
+      <div>http://example.com/2024/03/05/数据库/CMU_15445/P4实验笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" title="P3实验笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">P3实验笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(2)/" title="P2实验笔记(2)">
+                        <span class="hidden-mobile">P2实验笔记(2)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

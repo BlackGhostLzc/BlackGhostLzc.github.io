@@ -255,6 +255,496 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          线程池的C语言实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          1.任务队列线程池结构体就是存储任务队列的。很明显，任务中需要有执行函数的函数地址和传入的参数。 12345typedef struct Task&#123;    void (*function)(void *arg);    void *arg;&#125; Task; 在这里，我们的function函数只接受单个参数。  如果需要多个参数呢？我在github上给出了一小段实现代码。这是我的g
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-05 15:12" pubdate>
+              2023-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+            
+              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
+          线程池概述
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/05/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A6%82%E8%BF%B0/" target="_self">
+        <div>
+          1.线程池的原理为什么需要线程池  并发的线程数目较多，假如每一个线程都只是执行一个时间很短的任务就结束了，那么这样频繁的创建线程就会大大降低系统的效率，因为频繁创建和销毁线程都需要时间。  线程池就是使得线程可以复用，一个线程执行完一个任务后并不销毁。线程池里的线程都是后台线程。如果某个线程在托管代码中空闲，那么线程池将插入另一个辅助线程来使所有处理器繁忙。如果线程池中的所有线程都繁忙，但队列中
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-05 12:41" pubdate>
+              2023-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="category-chain-item">线程池</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/">#项目</a>
+            
+              <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">#线程池</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
+          硬件视角的操作系统
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%A1%AC%E4%BB%B6%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
+        <div>
+          本讲内容：计算机硬件的状态机模型；回答以下问题： 什么是计算机硬件？ 计算机硬件和程序员之间是如何约定的？ 听说操作系统也是程序。那到底是鸡生蛋还是蛋生鸡？  硬件与程序员的约定Bare-metal 与程序员的约定 Bare-metal 是指在没有操作系统或者其他软件支持的情况下直接运行硬件的情况。   Bare-metal 与厂商的约定  CPU Reset 后的状态 (寄存器值)
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:48" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
+          系统调用和UNIX Shell
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8CUNIX%20Shell/" target="_self">
+        <div>
+          本讲内容 Shell xv6 shell 代码讲解  什么是 shell os &#x3D; API + 对象 人不可能直接使用系统调用来使用操作系统，所以人和操作系统之间隔了一个应用程序，这个应用程序就叫 shell。shell 把内核的 API 和对象做一层封装，来帮助用户管理操作系统对象的一个应用程序 。有 graphic shell 和 command line shell。    she
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:36" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B/" target="_self">
+          输入输出设备模型
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B/" target="_self">
+        <div>
+          IO设备(CPU视角)：一个能与CPU交换数据的接口&#x2F;控制器 就是“几组约定好功能的线”，通过握手信号从线上读出&#x2F;写入数据 每一组线都有自己的地址 CPU可以直接使用指令(in&#x2F;out&#x2F;MMIO)和设备交换数据CPU不管设备具体是如何实现的    总线、中断控制器和DMA越来越多的IO设备，如何给未来留出一点空间？  CPU只直接连接一个设备，这个IO设备实
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:36" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" target="_self">
+          设备驱动程序
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" target="_self">
+        <div>
+          本次课的主要内容 什么是设备驱动程序 Linux设备抽象  设备驱动程序原理 设备其实是一组寄存器和一组协议，一个设备，一个协议  设备可以分为两种  字符设备：字节流，例如键盘 块设备：字节数组，例如磁盘  操作系统：设备&#x3D;支持各类操作的对象（文件） read: 从设备某个指定的位置读出数据 write：向设备某个位置写入数据 ioctl: 读取&#x2F;设置设备的状态, ioctl
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:36" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%EF%BC%9B%E8%BF%9B%E7%A8%8BAPI/" target="_self">
+          内核线程与进程、进程API
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%EF%BC%9B%E8%BF%9B%E7%A8%8BAPI/" target="_self">
+        <div>
+          什么是操作系统虚拟化：操作系统同时保存多个状态机C程序 &#x3D; 状态机  初始状态： main(argc, argv) 状态迁移： 指令的执行，包括syscall  实际上，在 UNIX&#x2F;Linux 系统内核完成初始化后，只有一个 init 进程被启动，从此以后，操作系统内核就化身为了一个事件驱动的程序、状态机的管理者，仅在中断和系统调用发生时开始执行。 下面看一段小代码 1234
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-02 23:36" pubdate>
+              2023-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F/" target="_self">
           可执行程序
         </a>
@@ -459,501 +949,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A0%E8%BD%BD(1)/" target="_self">
-          动态链接和加载(1)
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A0%E8%BD%BD(1)/" target="_self">
-        <div>
-          本次课要回答的问题 可执行文件是如何被操作系统加载的 什么是动态链接&#x2F;动态加载  静态ELF加载器：实现加载器 解析数据结构 + 复制到内存 + 跳转 创建进程运行时的初始状态(argv,envp,…)  loader-static.c 可以加载任何静态链接的代码, minimal.S, dfs-fork.c 并可以正确处理参数&#x2F;环境变量 env.c12345678910111
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Linux%E4%B8%96%E7%95%8C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F(%E6%9E%84%E5%BB%BA%E6%9C%80%E5%B0%8F%E7%9A%84Linux)/" target="_self">
-          Linux世界中的应用程序(构建最小的Linux)
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Linux%E4%B8%96%E7%95%8C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F(%E6%9E%84%E5%BB%BA%E6%9C%80%E5%B0%8F%E7%9A%84Linux)/" target="_self">
-        <div>
-          Kernel 加载第一个进程 （init 应用程序）  相当于在操作系统中放置一个位于初始状态的状态机   包含一些进程可以操纵的操作系统对象  然后 Linux 变成一个中断(系统调用)处理程序   systemd为什么是进程树的根 (init 进程并不是 systemd) Linux Kernel 系统调用上的发行版和应用生态 系统工具 coreutils, binutils, systemd
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E4%BB%A3%E7%A0%81%E9%A3%8E%E6%A0%BC%E5%92%8C%E5%AE%9A%E5%88%B6%E5%8C%96gdb%E8%B0%83%E8%AF%95/" target="_self">
-          代码风格和定制化gdb调试
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E4%BB%A3%E7%A0%81%E9%A3%8E%E6%A0%BC%E5%92%8C%E5%AE%9A%E5%88%B6%E5%8C%96gdb%E8%B0%83%E8%AF%95/" target="_self">
-        <div>
-          本讲内容 编程中的一些细节 调试工具的正确使用方法  软件的热更新DSU代码实现1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859#include &lt;stdio.h&gt;#include &lt;string.h&gt;#i
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4/" target="_self">
-          Linux进程地址空间
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4/" target="_self">
-        <div>
-          Linux进程的地址空间有什么工具可以来查看进程的地址空间  pmap cat &#x2F;proc&#x2F; [pid] &#x2F; maps gdb readelf objdump  有的程序刚开始执行就结束了(比如打印一个东西就退出)，如果要查看这个进程的地址空间。那怎么办？  使用gdb。使用gdb命令 info inferiors得到进程的pid   该命令打印gdb当前管理的inf
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/fork%E7%9A%84%E5%BA%94%E7%94%A8/" target="_self">
-          fork的应用
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/fork%E7%9A%84%E5%BA%94%E7%94%A8/" target="_self">
-        <div>
-          复习 fork状态机复制，包括持有的所有操作系统对象(如文件描述符) execve重置状态机，但继承持有的所有操作系统的对象 例如在fork之前打开一个管道, 然后就可以把一部分计算的输出管道给另外一个进程的输入  文件描述符1int open(const char *pathname, int flags);   RTFM: O_CLOEXEC : execve时文件描述符不应该被继承； O_A
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/C%E6%A0%87%E5%87%86%E5%BA%93%E5%92%8C%E5%AE%9E%E7%8E%B0/" target="_self">
-          C标准库和实现
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/C%E6%A0%87%E5%87%86%E5%BA%93%E5%92%8C%E5%AE%9E%E7%8E%B0/" target="_self">
-        <div>
-          我们该如何学习 C 标准库? 直接调试 glibc (像我们上课那样) 寻找更好的替代品，一定有为嵌入式设备实现的简化 libc。 选择 muslmusl是一个轻量级的C标准库，它专注于提供高效、可靠和安全的C语言运行时环境。musl库的设计目标是遵循POSIX标准，同时保持代码的简洁和易于维护。它主要用于嵌入式系统、轻量级容器和其他类似的应用程序中，因为它比其他标准库更小、更快、更安全，并且不包
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 23:36" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%BA%94%E7%94%A8%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
-          应用视角的操作系统
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/02/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%BA%94%E7%94%A8%E8%A7%86%E8%A7%92%E7%9A%84%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" target="_self">
-        <div>
-          本讲内容：指令序列和高级语言的状态机模型；回答以下问题： 什么是软件 (程序)？ 如何在操作系统上构造最小&#x2F;一般&#x2F;图形界面应用程序？ 什么是编译器？编译器把一段程序翻译成什么样的指令序列才算 “正确”？  构建一个最小的程序12345#include&lt;stdio.h&gt;int main()&#123;	printf(&quot;Hello World\n&quot;)
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-08-02 22:20" pubdate>
-              2023-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">jyy操作系统</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#jyy操作系统</a>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/6/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><span class="page-number current">7</span>
+      <a class="extend prev" rel="prev" href="/page/6/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/#board">8</a><a class="extend next" rel="next" href="/page/8/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

@@ -255,6 +255,636 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          管道的实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          管道的实现1int pipe(int*);  在Linux中，一切皆文件，管道也是一种文件！ 我们来看在xv6中，管道究竟是如何被实现的。我们直接来看sys_pipe函数。 我们首先获取到传进来的数组fdarray，这是数组在进程地址空间中虚拟地址，然后就调用pipealloc向向操作系统内核申请两个文件。  struct file是操作系统管理的，而文件描述符则是进程所有的。操作系统有一个fta
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
+          文件系统的构建
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
+        <div>
+          xv6文件系统的构建我们再次回到如何通过qemu启动xv6操作系统的问题，qemu的命令是： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
+          xv6的启动
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
+        <div>
+          xv6启动(1)我们的xv6操作系统是运行在qemu模拟器上的，如果我想要知道究竟是如何启动这个操作系统的，那么我就要知道是如何启动qemu,并传入一些什么参数的。通过make -nB，有如下命令： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
+          Shell
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
+        <div>
+          shell这部分的笔记主要来源于user/sh.c文件，这里面有很多代码的技巧，很值得学习。这部分主要弄清楚xv6中的shell是如何工作的。  一条完整的命令是如何开始运行的 是如何实现重定向的  （ &gt; 符号) 是如何执行管道命令的  （ | 符号） 以及List命令，后台执行等。  首先sh程序会打开三次console 文件，使得0,1,2三个文件描述符都指向console 。然后就可
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          Printf的实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          printf函数的实现在介绍printf 函数之前，我们先要来了解一下C语言里面是如何实现边长参数的。printf 正是通过变长参数来实现格式化的打印的。 C 可变参数声明方式为： 1int func (int arg1, ...);  其中... 表示可变参数列表。 请注意，函数 func() 最后一个参数写成省略号，即三个点号（**…**），省略号之前的那个参数是 int，代表了要传递的可变参
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
+          Fork&amp;&amp;Execve的实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
+        <div>
+          Fork我们来看一下fork函数是如何实现的，fork是完全把父进程的状态机复制了一份。 首先，先获取当前进行系统调用的线程，然后再allocproc申请一个新的进程。在xv6操作系统中，进程的管理是一个proc数组。 12345678910int fork(void)&#123;  int i, pid;  struct proc *np;  struct proc *p = myproc();
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:05" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          锁的实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          自旋锁（Spin lock）的实现 什么是自旋锁自旋锁是一种忙等待的锁机制。锁的特性就是只有一个进程可以获取锁，在任何时间点都不能有超过一个锁的持有者。在acquire里面有一个死循环，循环中判断锁对象的locked字段是否为0，如果为0那表明当前锁没有持有者，当前对于acquire的调用可以获取锁。之后我们通过设置锁对象的locked字段为1来获取锁。最后返回。   但两个进程可能同时读到 lo
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
+          线程切换(2)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
+        <div>
+          线程切换过程中锁的限制 在线程切换的过程中需要一直持有p-&gt;lock  防止两个CPU核使用同一个栈运行同一个线程   XV6中，不允许进程在执行switch函数的过程中，持有任何其他的锁。  防止死锁。示例：如果xv6在内核中关闭了中断，P1的内核线程持有了p-&gt;lock以外的其他锁，这些锁可能是在使用磁盘，UART，console过程中持有的。之后内核线程在持有锁的时候，通过调用s
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
+          线程切换(1)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
+        <div>
+          xv6中的线程一个线程可以认为是串行执行代码的单元。  内核线程的概念，对于每个用户进程都有一个内核线程来执行来自用户进程的系统调用。所有的内核线程都共享了内核内存，所以XV6的内核线程的确会共享内存。 每一个用户进程都有独立的内存地址空间，并且包含了一个线程，这个线程控制了用户进程代码指令的执行。所以XV6中的用户线程之间没有共享内存，你可以有多个用户进程，但是每个用户进程都是拥有一个线程的独立
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-02-29 14:04" pubdate>
+              2024-02-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+            
+              <a href="/tags/xv6-labs/">#xv6-labs</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" target="_self">
           文件系统实现概述
         </a>
@@ -319,641 +949,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
-          系统调用和trap
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
-        <div>
-          简单介绍这篇笔记主要帮助回顾xv6是如何经过trap陷入到内核去的，介绍相关的代码的重要的细节。  重要的寄存器   SATP（Supervisor Address Translation and Protection）：它包含了指向page table的物理内存地址 STVEC（Supervisor Trap Vector Base Address Register）：它指向了内核中处理trap
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
-          文件系统层级结构
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84/" target="_self">
-        <div>
-          1.文件系统组织架构   disk层：对硬盘上的块进行读写操作  buffer cache层：在内存中对磁盘块进行缓存，并确保只有1个内核进程能在一段时间内修改文件块上存储的数据。  logging层：让更高的层级能够将对文件块的所有update打包到一个transaction中，从而能保证所有文件块能够在将要崩溃时原子地进行update  inode层：为每个文件提供独一无二的inode num
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E4%B8%AD%E6%96%AD%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" target="_self">
-          中断与设备驱动程序
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E4%B8%AD%E6%96%AD%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" target="_self">
-        <div>
-          什么是中断中断对应的场景很简单，就是硬件想要得到操作系统的关注。操作系统需要做的是，保存当前的工作，处理中断，处理完成之后再恢复之前的工作。这里的保存和恢复工作，与我们之前看到的系统调用过程非常相似。所以系统调用，page fault，中断，都使用相同的机制。  中断与系统调用的区别   asynchronous（异步性）：当硬件生成中断时，Interrupt handler与当前运行的进程在CP
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/sleep&amp;wakeup/" target="_self">
-          Sleep&amp;&amp;Wakeup
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/sleep&amp;wakeup/" target="_self">
-        <div>
-          Sleep &amp; wakeupsleep是当一个进程在等待某一个事件时陷入休眠状态，当这个事件发生时另外一个进程唤醒它。陷入休眠状态可以让这个进程不在等待的时候占用CPU资源 sleep(chan)让这个进程睡眠在chan这个wait channel上，wakeup(chan)将所有睡眠在chan上的进程全部唤醒。 lost wake-up problem：当一个进程A即将睡眠时，另外一个进
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab9%20file%20system/" target="_self">
-          Lab9:File System
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab9%20file%20system/" target="_self">
-        <div>
-          Large Files我们知道，在我们现在的xv6文件系统设计中，每一个文件最大只能有268*BSIZE(12 + 256)，一个文件(inode)有12个direct block，还有1个singlely-indirect block。 1uint addrs[NDIRECT+1];    // struct inode  这里，我们将为文件进行扩容，添加一个doubly-indirect的bl
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab6%20thread/" target="_self">
-          Lab6:Thread
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab6%20thread/" target="_self">
-        <div>
-          Uthread: switching between threads题目概述：补充代码展现线程调换的机制。代码在文件user&#x2F;uthread.c 和 user&#x2F;uthread_switch.S中。主要内容见课程主页。  首先需要在thread结构体中添加一个user_context保存上下文。12345678910111213141516171819202122232425st
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab8%20lock/" target="_self">
-          Lab8:Lock
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab8%20lock/" target="_self">
-        <div>
-          Lock LabMemory allocator操作系统把物理内存组织成一个链表，每个CPU获取物理内存时都需要在这个链表中进行获取，这样当多个CPU获取时就要通过锁保护好这个链表，而在这个实验中，我们需要为每一个CPU都分配一个物理内存的链表，这样就可以降低kalloc实现中锁的竞争。 但存在这样一种情况，某一个CPU中kalloc过多导致它自己的链表中空闲的物理页面已经不足了，这就需要它从其他
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab5%20cow/" target="_self">
-          Lab5:COW
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab5%20cow/" target="_self">
-        <div>
-          实验背景大概就是说我们需要实现 UNIX 中的写时复制技术 （copy on write）。在没有写时复制的系统中，调用 fork() 时，我们会把父进程的所有的内存都拷贝到子进程的空间，自然，这个耗时是巨大且不可接受的。 并且在实际应用中，fork() 时拷贝的大部分内存都时不会被用到的，比如，在 UNIX 中新建一个进程的通常会先调用 fork()，然后调用 exec()。那么原先复制过来的数
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab4%20traps/" target="_self">
-          Lab4:Traps
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab4%20traps/" target="_self">
-        <div>
-          RISC-V assembly (easy)首先，做这个实验前，需要先了解gdb如何调试内核。 编译 xv6 操作系统并运行在 QEMU 模拟器中，并启动 GDB 调试器。 1234$make CPUS=1 qemu-gdb*** Now run &#x27;gdb&#x27; in another window.qemu-system-riscv64 -machine virt -bios no
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/#board">8</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

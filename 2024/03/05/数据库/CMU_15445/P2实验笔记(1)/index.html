@@ -1,0 +1,788 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Overview写这篇文章的目的主要用于B+树实现过程中的一些总结，不会太多涉及代码的实现，主要介绍思路和结构。个人感觉这是整个课程实验中最难的一个实验了。早就听说数据库中常用B+树来做索引，现在终于有机会直观地了解这一部分了。 这篇文章主要介绍CheckPoint1的内容。下一篇文章介绍B+树中的并发。 B+树的结构B+树中有两种节点，一种是InternalPage，另一种是LeafPage。这">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P2实验笔记(1)">
+<meta property="og:url" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="Overview写这篇文章的目的主要用于B+树实现过程中的一些总结，不会太多涉及代码的实现，主要介绍思路和结构。个人感觉这是整个课程实验中最难的一个实验了。早就听说数据库中常用B+树来做索引，现在终于有机会直观地了解这一部分了。 这篇文章主要介绍CheckPoint1的内容。下一篇文章介绍B+树中的并发。 B+树的结构B+树中有两种节点，一种是InternalPage，另一种是LeafPage。这">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png">
+<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/split.png">
+<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/redistribute.png">
+<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/coalece.png">
+<meta property="article:published_time" content="2024-03-05T15:36:06.418Z">
+<meta property="article:modified_time" content="2024-03-05T15:41:34.438Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="CMU_15445">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png">
+  
+  
+  
+  <title>P2实验笔记(1) - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="P2实验笔记(1)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-05 23:36" pubdate>
+          2024年3月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">P2实验笔记(1)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a><strong>Overview</strong></h2><p>写这篇文章的目的主要用于B+树实现过程中的一些总结，不会太多涉及代码的实现，主要介绍思路和结构。个人感觉这是整个课程实验中最难的一个实验了。早就听说数据库中常用B+树来做索引，现在终于有机会直观地了解这一部分了。</p>
+<p>这篇文章主要介绍CheckPoint1的内容。下一篇文章介绍B+树中的并发。</p>
+<h2 id="B-树的结构"><a href="#B-树的结构" class="headerlink" title="B+树的结构"></a><strong>B+树的结构</strong></h2><p>B+树中有两种节点，一种是<code>InternalPage</code>，另一种是<code>LeafPage</code>。这两种page可以抽象成<code>BPlusTreePage</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BPlusTreePage</span> &#123;</span><br> public:<br> private:<br>  <span class="hljs-comment">// member variable, attributes that both internal and leaf page share</span><br>  IndexPageType page_type_;   <span class="hljs-comment">// leaf or internal. 4 Byte</span><br>  <span class="hljs-type">lsn_t</span> lsn_  				  <span class="hljs-comment">// temporarily unused. 4 Byte</span><br>  <span class="hljs-type">int</span> size_;  				  <span class="hljs-comment">// tree page data size(not in byte, in count). 4 Byte</span><br>  <span class="hljs-type">int</span> max_size_;  			  <span class="hljs-comment">// tree page data max size(not in byte, in count). 4 Byte</span><br>  <span class="hljs-type">page_id_t</span> parent_page_id_;  <span class="hljs-comment">// 4 Byte</span><br>  <span class="hljs-type">page_id_t</span> page_id_; 		  <span class="hljs-comment">// 4 Byte</span><br>  <span class="hljs-comment">// Header data 24 Byte in total </span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BPlusTreeInternalPage</span> :</span> public BPlusTreePage &#123;<br> public:<br> private:<br>  <span class="hljs-comment">// Flexible array member for page data.</span><br>  <span class="hljs-meta">#<span class="hljs-keyword">define</span> MappingType std::pair<span class="hljs-string">&lt;KeyType, ValueType&gt;</span></span><br>  MappingType array_[<span class="hljs-number">1</span>];<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BPlusTreeLeafPage</span> :</span> public BPlusTreePage &#123;<br> public:<br> private:<br>  <span class="hljs-type">page_id_t</span> next_page_id_;<br>  <span class="hljs-comment">// Flexible array member for page data.</span><br>  MappingType array_[<span class="hljs-number">1</span>];<br></code></pre></td></tr></table></figure>
+
+<p>可以看到<code>LeafePage</code>相较于<code>InternalPage</code>，它的元数据还多了一个<code>next_page_id</code>，这个字段在设计B+树的迭代器的时候作用十分大。</p>
+<p>那么该如何获取这些B+树的节点呢? 答案就在下面。<strong>reinterpret_cast 运算符并不会改变括号中运算对象的值，而是对该对象从位模式上进行重新解释</strong>，有了前面的铺垫很容易理解这个函数，即原先该内存解读为 <code>Page</code>，现在解读为 <code>BPlusTreePage</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">Page *page = buffer_pool_manager-&gt;FetchPage(page_id);<br><span class="hljs-comment">// 强制类型转化 page-&gt;GetData()</span><br>BPlusTreePage *page_node = reinterpret_cast&lt;BPlusTreePage *&gt;(page-&gt;GetData());<br></code></pre></td></tr></table></figure>
+
+
+
+<p>我们现在再来看一下Bustub中的B+树的视图:</p>
+<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+
+<p>对于B+树里面的<code>InternalPage</code>，它的key字段是索引，而它的value则是子节点的<code>PageId</code>。对于B+树里面的<code>LeafPage</code>，它的key字段也是建立的索引字段，而value部分则是数据条目对应的位置<code>RID</code>。</p>
+<p>所以对于<code>InternalPage</code>，它的key是需要比value少1个的，Project 中要求，第一个 Key 为空。主要是因为在 internal page 中，n 个 key 可以将数轴划分为 n+1 个区域，也就对应着 n+1 个 value。</p>
+<p>熟悉了B+树的基本结构后，我们简单介绍一下三种操作(<code>Insert</code> <code>Delete</code> <code>LookUp</code>)的实现思路。</p>
+<h2 id="LookUp"><a href="#LookUp" class="headerlink" title="LookUp"></a><strong>LookUp</strong></h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">GetValue</span><span class="hljs-params">(<span class="hljs-type">const</span> KeyType &amp;key, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;ValueType&gt; *result, Transaction *transaction)</span><br></code></pre></td></tr></table></figure>
+
+<p>当拿到一个 key 需要查找对应的 value 时，首先需要经由 internal page 递归地向下查找，最终找到 key 所在的 leaf page。这个过程可以简化为一个函数 <code>Findleaf()</code>。</p>
+<p><code>FindLeaf</code>只需要找到可能存在<code>key</code>的leaf page，如果是internal page，根据 key 在当前 internal page 中找到对应的 child page id(我们在拿到 page id 后，调用 buffer pool 的 <code>FetchPage()</code> 函数来获取对应的 page 指针。要注意的是，在使用完 page 之后，需要将 page unpin 掉，否则最终会导致 buffer pool 中的所有 page 都被 pin 住，无法从 disk 读取其他的 page。然后再在下层 page 寻找)，最后在返回的 leaf page 里进行<code>LookUp</code>查找。</p>
+<h2 id="Insert"><a href="#Insert" class="headerlink" title="Insert"></a><strong>Insert</strong></h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">Insert</span><span class="hljs-params">(<span class="hljs-type">const</span> KeyType &amp;key, <span class="hljs-type">const</span> ValueType &amp;value, Transaction *transaction = nullptr)</span><br></code></pre></td></tr></table></figure>
+
+<p>与 Search 相同，第一步是根据 key 找到需要插入的 leaf page。同样是调用 <code>Findleaf()</code>。得到 leaf page 后，将 key 插入 leaf page。要注意的是，插入时仍需保证 key 的有序性。同样可以二分搜索找到合适的位置插入。</p>
+<p>在把KV插入叶子节点后，需要判断 leaf page 是否是等于<code>max_size_</code>的，如果是，则需要进行一次分裂操作，叶子节点的分裂过程如下：</p>
+<ol>
+<li>新建一个空的 page</li>
+<li>将原 page 的一半转移到新 page 中，（假如选择将新 page 放在原 page 右侧，则转移原 page 的右半部分）</li>
+<li>更新原 page 和新 page 的 next page id</li>
+<li>获取 parent page</li>
+<li>将用于区分原 page 和新 page 的 key 插入 parent page 中</li>
+<li>更新 parent page 所有 child page 的父节点指针</li>
+</ol>
+<p>往parent page里插入新的KV后，还需要判断parent page是否是满的状态，则还需要对parent page进行分裂，parent page的分裂过程如下：</p>
+<ol>
+<li>新建一个空的 page， </li>
+<li>将原 page 的一半转移到新 page 中，需要注意原 page 和新 page 的第一个 key 都是无效的， </li>
+<li>更新新 page 所有 child page 的父节点指针，指向新 page </li>
+<li>获取 parent page</li>
+<li>将用于区分原 page 和新 page 的 key 插入 parent page 中， 6. 更新 parent page 所有 child page 的父节点指针。</li>
+</ol>
+<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/split.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
+
+<p>对于root page内KV已满的情况，初始化就比一般情况下复杂一点，如上图所示，它需要设置两个KV，<code>array_[0].Value</code>设置为 left page的PageId，<code>array_[0].Key</code>不需要进行设置，<code>array_[1].Value</code>设置成 right page的PageId，<code>array_[1].Key</code>需要设置成 right page的一条元素的Key。</p>
+<h2 id="Deletion"><a href="#Deletion" class="headerlink" title="Deletion"></a><strong>Deletion</strong></h2><p>将一个 KV 在 B+树删除，最终需要在叶子节点的 Leaf Page 删除 KV ，并同时进行适当的调整使得 B+树始终满足它的性质，具体的：</p>
+<ol>
+<li>首先找到叶子结点(<code>FindLeaf</code>)</li>
+<li>如果叶子结点内存在KV，并且删除后叶子结点内的元素个数仍满足 ≥ min_size，直接删除</li>
+<li>否则，需要进行 <code>CoalesceOrRedistribute</code></li>
+<li>向父亲递归操作</li>
+</ol>
+<p>函数<code>CoalesceOrRedistribute</code>是对删除某个元素后的 page 进行的调整，看这个 page 是需要与它的左邻居(或是右邻居)进行合并(Coalesce)还是简单地从左邻居(右邻居)中借走一个KV(Redistribute)。</p>
+<h3 id="Redistribute"><a href="#Redistribute" class="headerlink" title="Redistribute"></a><strong>Redistribute</strong></h3><p>尝试从两侧的兄弟节点中借一个 KV 对（父节点相同的节点中选取）假如存在一侧节点有富余的 KV 对，则成功，结束操作。</p>
+<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/redistribute.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+
+<p>除了需要进行左右节点之间KV的移动，还需要调整parent page中的某一个KV，只需要在原来基础上更改，并不需要添加或删除。对于重分配，并不需要继续对parent page进行其他操作。</p>
+<h3 id="Coalesce"><a href="#Coalesce" class="headerlink" title="Coalesce"></a><strong>Coalesce</strong></h3><p>如果左右邻居的节点都没有富足的节点外借，那么就可以进行将当前page与左(右)邻居进行合并，合并之后，parent page 也需要删除对应的KV，这一步继续对应函数<code>CoalesceOrRedistribute</code>，也就是递归向上。</p>
+<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/coalece.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+
+<p>另外不要忘记了设置字段<code>NextPageId</code>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/CMU-15445/" class="print-no-link">#CMU_15445</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>P2实验笔记(1)</div>
+      <div>http://example.com/2024/03/05/数据库/CMU_15445/P2实验笔记(1)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(2)/" title="P2实验笔记(2)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">P2实验笔记(2)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P1%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" title="P1实验笔记">
+                        <span class="hidden-mobile">P1实验笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
