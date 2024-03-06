@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="Memtable(2)这篇文章我们开始剖析Memtable 的代码实现和核心数据结构SkipList  相较于传统的链表，跳表采取空间换时间的策略，建立多层索引，实现了查找和插入都只需要logn级别的优化。 SkipList 的结构如下所示：     SkipList的结构LevelDB 跳表代码上，主要涉及 C++11 中 atomic 标准库中新支持的几种 memory order，规定了一些">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%904-Memtable(2)/img/skiplist-1.png">
+<meta property="og:image" content="http://example.com/img/leveldb/skiplist-1.png">
 <meta property="article:published_time" content="2024-02-26T09:53:35.227Z">
-<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:modified_time" content="2024-03-06T07:31:07.440Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="LevelDB源码分析">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%904-Memtable(2)/img/skiplist-1.png">
+<meta name="twitter:image" content="http://example.com/img/leveldb/skiplist-1.png">
   
   
   
@@ -316,7 +316,7 @@
                 <h2 id="Memtable-2"><a href="#Memtable-2" class="headerlink" title="Memtable(2)"></a><strong>Memtable(2)</strong></h2><p>这篇文章我们开始剖析<code>Memtable</code> 的代码实现和核心数据结构<code>SkipList</code> </p>
 <p>相较于传统的链表，跳表采取空间换时间的策略，建立多层索引，实现了查找和插入都只需要logn级别的优化。</p>
 <p><code>SkipList</code> 的结构如下所示：</p>
-<img src="./img/skiplist-1.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;" />
+<img src="/img/leveldb/skiplist-1.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
 
 
 

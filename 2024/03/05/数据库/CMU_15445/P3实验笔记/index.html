@@ -23,15 +23,15 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="Query Execution从这一个实验开始，我们就正式进入了Bustub数据库的底层实现部分。这个实验完成后，我们利用我们实现的算子，可以在本机进行SQL语句的查询。 SQL语句的执行Parser 一条 sql 语句，首先经过 Parser 生成一棵抽象语法树 AST。Bustub 中采用了 libpg_query 库将 sql 语句 parse 为 AST。这个地方主要运用的是编译原理的内容">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/iteratormodel.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/p3-2.jpg">
+<meta property="og:image" content="http://example.com/img/bustub/iteratormodel.png">
+<meta property="og:image" content="http://example.com/img/bustub/p3-2.jpg">
 <meta property="article:published_time" content="2024-03-05T15:36:06.438Z">
-<meta property="article:modified_time" content="2024-03-05T15:41:34.438Z">
+<meta property="article:modified_time" content="2024-03-06T07:24:20.470Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="CMU_15445">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/iteratormodel.png">
+<meta name="twitter:image" content="http://example.com/img/bustub/iteratormodel.png">
   
   
   
@@ -339,7 +339,7 @@
 <li>Bottom-to-Top. 从叶子节点算子开始，向上层算子 push 自己的数据。</li>
 </ol>
 <p>我们来看一个具体的例子，理解一下火山模型：</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/iteratormodel.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;">
+<img src="/img/bustub/iteratormodel.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;">
 
 <p>右下是我们的执行算子，最顶层的是1个projection的算子，它不断调用<code>Next</code> 方法获取它的每一条记录，它有1个<code>child_executor_</code> 的子算子为它不断提供它需要进行projection的数据，这个算子在这里是一个Join类型的算子，它的每一条数据是怎么来的呢，当然也是通过不断调用<code>Next</code> 方法从它的左儿子和右儿子执行算子中获取的，左儿子和右儿子也是通过<code>Next</code> 方法获得数据条目的。可以看到，叶子节点的算子肯定要从数据库中的表中获取数据，也就是叶子算子一定是SeqScan算子。中间的算子对获取到的<code>Tuple</code> 进行加工，获得中间结果，再把中间结果传递给上层算子。整个火山模型就是这样的一个工作流程。</p>
 <p>我们可以看到，这种火山模型获取一条数据都需要一条很长的<code>Next</code> 调用函数链，函数的花销是很大的。</p>
@@ -361,7 +361,7 @@
 <figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">SELECT * FROM <span class="hljs-built_in">t1</span> WHERE <span class="hljs-built_in">t1</span>.x = <span class="hljs-built_in">t1</span>.y + <span class="hljs-number">1</span> <span class="hljs-keyword">AND </span><span class="hljs-built_in">t1</span>.y &gt; <span class="hljs-number">0</span>;<br></code></pre></td></tr></table></figure>
 
 <p>重点关注 <code>WHERE</code> 后的表达式 <code>t1.x = t1.y + 1 AND t1.y &gt; 0</code>。看这下面这张图，这其实就是一棵表达式树，sql中所有的表达式都会被parse成表达式树，再进行绑定。</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/p3-2.jpg" srcset="/img/loading.gif" lazyload style="zoom: 67%;">
+<img src="/img/bustub/p3-2.jpg" srcset="/img/loading.gif" lazyload style="zoom: 67%;">
 
 <p>在NestedLoopJoin里，调用的是<code>EvaluateJoin</code>,返回是true表示匹配成功。</p>
 <p> 我们来看里匹配的判断逻辑：</p>

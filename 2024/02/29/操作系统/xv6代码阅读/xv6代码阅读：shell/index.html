@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="shell这部分的笔记主要来源于user&#x2F;sh.c文件，这里面有很多代码的技巧，很值得学习。这部分主要弄清楚xv6中的shell是如何工作的。  一条完整的命令是如何开始运行的 是如何实现重定向的  （ &gt; 符号) 是如何执行管道命令的  （ | 符号） 以及List命令，后台执行等。  首先sh程序会打开三次console 文件，使得0,1,2三个文件描述符都指向console 。然后就可">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/shell-1.png">
+<meta property="og:image" content="http://example.com/img/xv6-labs/shell-1.png">
 <meta property="article:published_time" content="2024-02-29T06:05:01.561Z">
-<meta property="article:modified_time" content="2024-02-29T06:32:06.236Z">
+<meta property="article:modified_time" content="2024-03-06T07:42:16.830Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="xv6代码阅读">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/shell-1.png">
+<meta name="twitter:image" content="http://example.com/img/xv6-labs/shell-1.png">
   
   
   
@@ -340,7 +340,7 @@
 <li>检查是否有；（多条命令分别要执行），如果有，递归调用<code>parseline</code>，将所有的命令分别解析后连接起来。</li>
 </ol>
 <p>这里面有一个技巧，在命令构造的过程中，用到了递归的链式连接的形式构造命令。因为一个命令可能非常复杂，例如<code>ls &lt; y; ls | sort; who</code>这样的命令，这条命令就可以构造起如下这个链式的命令串：</p>
-<img src="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/shell-1.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;">
+<img src="/img/xv6-labs/shell-1.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;">
 
 <p><code>parsecmd()</code>是命令构造函数，它简单地把工作转交给<code>parseline()</code>函数。</p>
 <p><code>parseline</code>顾名思义就是处理一行的输入字符串，把它转化成命令。这一行的概念有点抽象，实际上应该是可以视作一个命令整体的一行字符串，在这行字符串里可以包含各种命令，也就是<code>|&amp;&lt;&gt;();</code>这些字符都可以处理。所有需要处理全部类型字符的工作都可以交给<code>parseline()</code>完成。<code>parseline()</code>里还可以递归地调用<code>parseline()</code>。</p>

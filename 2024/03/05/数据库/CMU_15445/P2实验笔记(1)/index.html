@@ -23,17 +23,17 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="Overview写这篇文章的目的主要用于B+树实现过程中的一些总结，不会太多涉及代码的实现，主要介绍思路和结构。个人感觉这是整个课程实验中最难的一个实验了。早就听说数据库中常用B+树来做索引，现在终于有机会直观地了解这一部分了。 这篇文章主要介绍CheckPoint1的内容。下一篇文章介绍B+树中的并发。 B+树的结构B+树中有两种节点，一种是InternalPage，另一种是LeafPage。这">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/split.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/redistribute.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/coalece.png">
+<meta property="og:image" content="http://example.com/img/bustub/bplustree.png">
+<meta property="og:image" content="http://example.com/img/bustub/split.png">
+<meta property="og:image" content="http://example.com/img/bustub/redistribute.png">
+<meta property="og:image" content="http://example.com/img/bustub/coalece.png">
 <meta property="article:published_time" content="2024-03-05T15:36:06.418Z">
-<meta property="article:modified_time" content="2024-03-05T15:41:34.438Z">
+<meta property="article:modified_time" content="2024-03-06T07:18:49.540Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="CMU_15445">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png">
+<meta name="twitter:image" content="http://example.com/img/bustub/bplustree.png">
   
   
   
@@ -332,7 +332,7 @@
 
 
 <p>我们现在再来看一下Bustub中的B+树的视图:</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/bplustree.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+<img src="/img/bustub/bplustree.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
 
 <p>对于B+树里面的<code>InternalPage</code>，它的key字段是索引，而它的value则是子节点的<code>PageId</code>。对于B+树里面的<code>LeafPage</code>，它的key字段也是建立的索引字段，而value部分则是数据条目对应的位置<code>RID</code>。</p>
 <p>所以对于<code>InternalPage</code>，它的key是需要比value少1个的，Project 中要求，第一个 Key 为空。主要是因为在 internal page 中，n 个 key 可以将数轴划分为 n+1 个区域，也就对应着 n+1 个 value。</p>
@@ -361,7 +361,7 @@
 <li>获取 parent page</li>
 <li>将用于区分原 page 和新 page 的 key 插入 parent page 中， 6. 更新 parent page 所有 child page 的父节点指针。</li>
 </ol>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/split.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
+<img src="/img/bustub/split.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
 
 <p>对于root page内KV已满的情况，初始化就比一般情况下复杂一点，如上图所示，它需要设置两个KV，<code>array_[0].Value</code>设置为 left page的PageId，<code>array_[0].Key</code>不需要进行设置，<code>array_[1].Value</code>设置成 right page的PageId，<code>array_[1].Key</code>需要设置成 right page的一条元素的Key。</p>
 <h2 id="Deletion"><a href="#Deletion" class="headerlink" title="Deletion"></a><strong>Deletion</strong></h2><p>将一个 KV 在 B+树删除，最终需要在叶子节点的 Leaf Page 删除 KV ，并同时进行适当的调整使得 B+树始终满足它的性质，具体的：</p>
@@ -373,11 +373,11 @@
 </ol>
 <p>函数<code>CoalesceOrRedistribute</code>是对删除某个元素后的 page 进行的调整，看这个 page 是需要与它的左邻居(或是右邻居)进行合并(Coalesce)还是简单地从左邻居(右邻居)中借走一个KV(Redistribute)。</p>
 <h3 id="Redistribute"><a href="#Redistribute" class="headerlink" title="Redistribute"></a><strong>Redistribute</strong></h3><p>尝试从两侧的兄弟节点中借一个 KV 对（父节点相同的节点中选取）假如存在一侧节点有富余的 KV 对，则成功，结束操作。</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/redistribute.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+<img src="/img/bustub/redistribute.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
 
 <p>除了需要进行左右节点之间KV的移动，还需要调整parent page中的某一个KV，只需要在原来基础上更改，并不需要添加或删除。对于重分配，并不需要继续对parent page进行其他操作。</p>
 <h3 id="Coalesce"><a href="#Coalesce" class="headerlink" title="Coalesce"></a><strong>Coalesce</strong></h3><p>如果左右邻居的节点都没有富足的节点外借，那么就可以进行将当前page与左(右)邻居进行合并，合并之后，parent page 也需要删除对应的KV，这一步继续对应函数<code>CoalesceOrRedistribute</code>，也就是递归向上。</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/coalece.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+<img src="/img/bustub/coalece.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
 
 <p>另外不要忘记了设置字段<code>NextPageId</code>。</p>
 

@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="mmap lab这个实验需要我们完成mmap系统调用： 1void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);  意思是映射描述符为 fd 的文件，的前 length 个字节到 addr 开始的位置。并且加上 offset 的偏移量（即不从文件的开头映射）    如果 addr 参数为 0">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab10%20mmap/addrspace.png">
+<meta property="og:image" content="http://example.com/img/xv6-labs/addrspace.png">
 <meta property="article:published_time" content="2024-02-29T06:04:51.854Z">
-<meta property="article:modified_time" content="2024-02-29T06:29:46.269Z">
+<meta property="article:modified_time" content="2024-03-06T07:47:12.380Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="xv6-labs">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab10%20mmap/addrspace.png">
+<meta name="twitter:image" content="http://example.com/img/xv6-labs/addrspace.png">
   
   
   
@@ -326,7 +326,7 @@
 
 <p>在调用mmap系统调用的时候，并不会立马就为进程进行该文件分配真实的物理地址到虚拟地址的映射，只是占用一个<code>vma</code> ，将相应的变量设置好，然后就立马返回。等到进程需要访问这段mmap的虚拟地址时，会触发缺页中断，再在缺页中断处理中进行物理内存分配和虚拟地址的映射。</p>
 <p>我们再来看一下进程的地址空间:</p>
-<img src="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/lab10%20mmap/addrspace.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
+<img src="/img/xv6-labs/addrspace.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;">
 
 <p>在mmap映射中，只能在heap中，不能超过trapframe。我们从heap顶端开始进行向下分配，所以我们需要记录一个<code>vaend</code> 表示最上面已被占用的地址空间。</p>
 <h3 id="sys-mmap"><a href="#sys-mmap" class="headerlink" title="sys_mmap"></a><strong>sys_mmap</strong></h3><p>首先我们来看<code>sys_mmap</code> 系统调用，主要逻辑就是在<code>vmas</code> 数组中找到一个未被占用的<code>struct vma</code> 。等到缺页中断发生时就用这个<code>vma</code> 进行物理内存的分配和地址的映射。返回文件映射的起始地址<code>vastart</code> 。</p>

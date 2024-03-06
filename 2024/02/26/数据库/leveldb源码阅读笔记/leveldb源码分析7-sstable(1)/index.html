@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="sstable首先我们看一下sstable的结构图  文件中的k&#x2F;v对是有序存储的，并且被划分到连续排列的Data Block里面，这些Data Block从文件头开始顺序存储，Data Block的存储格式代码在block_builder.cc中；  紧跟在Data Block之后的是Meta Block，其格式代码也在block_builder.cc中；Meta Block存储的是F">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/leveldb-sstable.png">
+<meta property="og:image" content="http://example.com/img/leveldb/leveldb-sstable.png">
 <meta property="article:published_time" content="2024-02-26T09:53:35.249Z">
-<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:modified_time" content="2024-03-06T07:32:42.170Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="LevelDB源码分析">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/leveldb-sstable.png">
+<meta name="twitter:image" content="http://example.com/img/leveldb/leveldb-sstable.png">
   
   
   
@@ -324,7 +324,7 @@
 <li><p>Index block是对Data Block的索引，对于其中的每个记录，其key &gt;&#x3D;Data Block最后一条记录的key，同时&lt;其后Data Block的第一条记录的key；value是指向data index的BlockHandle；</p>
 </li>
 </ol>
-<p><img src="/./img/leveldb-sstable.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/img/leveldb/leveldb-sstable.png" srcset="/img/loading.gif" lazyload></p>
 <p>sstbale结构体主要的一些成员</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c">Options options;<br>Options index_block_options;<br>WritableFile* file;                   <span class="hljs-comment">// 要写入的文件</span><br><span class="hljs-type">uint64_t</span> offset;                      <span class="hljs-comment">// 文件已写入的大小  </span><br>Status status;            <br>BlockBuilder data_block;              <span class="hljs-comment">// data_block缓冲，满后写入文件再置空          </span><br>BlockBuilder index_block;             <span class="hljs-comment">// index缓冲，最后才写入文件</span><br><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> last_key;                 <span class="hljs-comment">// 上一次插入的 key , 用来前缀压缩</span><br><span class="hljs-type">int64_t</span> num_entries;                 <br><span class="hljs-type">bool</span> closed;  <span class="hljs-comment">// Either Finish() or Abandon() has been called.</span><br>FilterBlockBuilder* filter_block;    <br><span class="hljs-type">bool</span> pending_index_entry;<br>BlockHandle pending_handle;            <span class="hljs-comment">// Handle to add to index block</span><br><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> compressed_output;<br></code></pre></td></tr></table></figure>
 

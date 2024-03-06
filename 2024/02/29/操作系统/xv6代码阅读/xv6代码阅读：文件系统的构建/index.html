@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="xv6文件系统的构建我们再次回到如何通过qemu启动xv6操作系统的问题，qemu的命令是： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel&#x2F;kernel -m 128M -smp 3 -nographic -drive file&#x3D;fs.img,if&#x3D;none,format&#x3D;raw,id&#x3D;x0 -device virtio-">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/fsimg-layout.png">
+<meta property="og:image" content="http://example.com/img/xv6-labs/fsimg-layout.png">
 <meta property="article:published_time" content="2024-02-29T06:05:01.583Z">
-<meta property="article:modified_time" content="2024-02-29T06:32:06.236Z">
+<meta property="article:modified_time" content="2024-03-06T07:42:16.830Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="xv6代码阅读">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/fsimg-layout.png">
+<meta name="twitter:image" content="http://example.com/img/xv6-labs/fsimg-layout.png">
   
   
   
@@ -321,7 +321,7 @@
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">fs.img: mkfs/mkfs README <span class="hljs-variable">$(UEXTRA)</span> <span class="hljs-variable">$(UPROGS)</span></span><br>	mkfs/mkfs fs.img README <span class="hljs-variable">$(UEXTRA)</span> <span class="hljs-variable">$(UPROGS)</span><br></code></pre></td></tr></table></figure>
 <p><code>mkfs</code>是一个C程序，并不在xv6中运行。我们发现，README、$(UEXTRA)、$(UPROGS)都是我们在<code>ls</code>得到的文件。那么我们去<code>mkfs/mkfs.c</code>文件中一探究竟吧！</p>
 <h3 id="mkfs-mkfs-c"><a href="#mkfs-mkfs-c" class="headerlink" title="mkfs&#x2F;mkfs.c"></a>mkfs&#x2F;mkfs.c</h3><p>首先来看一下fs.img中block的布局，mkfs.c主要就是构建这个布局。</p>
-<p><img src="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/fsimg-layout.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/img/xv6-labs/fsimg-layout.png" srcset="/img/loading.gif" lazyload></p>
 <p>第一部分，构建superblock。<code>wsect(uint sec, void *buf)</code>是往fs.img第sec个扇区写入内容，这个函数很简单，<code>lseek</code>函数就可以解决。</p>
 <blockquote>
 <p>superblock位于扇区1,它保存文件系统最基本的一些信息，例如扇区的总数，data blocks的数量,inode扇区的数量，log山区的数量等</p>

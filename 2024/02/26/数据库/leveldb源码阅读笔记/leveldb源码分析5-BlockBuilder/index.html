@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="BlockBuilder在讲解sstable之前，我们先来看一下Block结构体的内容。 Block由一条条的data_entry(前缀压缩)，以及重启点数组，重启点数组的大小还有5字节的crc32与一个type组成。所以我们解析一个block是很容易的。首先由于最后5个字节是crc32和type，所以可以找到重启点数组大小从而定位到重启点数组的开始位置，进而每一个data_entry都可以解析出">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%905-BlockBuilder/img/block.png">
+<meta property="og:image" content="http://example.com/img/leveldb/block.png">
 <meta property="article:published_time" content="2024-02-26T09:53:35.227Z">
-<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:modified_time" content="2024-03-06T07:31:37.020Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="LevelDB源码分析">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%905-BlockBuilder/img/block.png">
+<meta name="twitter:image" content="http://example.com/img/leveldb/block.png">
   
   
   
@@ -322,7 +322,7 @@
 
 
 
-<img src="./img/block.png" srcset="/img/loading.gif" lazyload style="zoom:33%;" />
+<img src="/img/leveldb/block.png" srcset="/img/loading.gif" lazyload style="zoom:33%;">
 
 
 

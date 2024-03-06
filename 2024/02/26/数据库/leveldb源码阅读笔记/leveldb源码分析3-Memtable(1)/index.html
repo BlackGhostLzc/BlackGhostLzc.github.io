@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="Memtable(1)对应文件：memtable.h和memtable.cc 每个 LevelDB 实例最多会维护两个 MemTable： mem_ 和 imm_。mem_ 可以读写，imm_ 只读。 12MemTable* mem_;MemTable* imm_ GUARDED_BY(mutex_);  &#x2F;&#x2F; Memtable being compacted LevelDB 的 MemTable">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%903-Memtable(1)/img/key_structure.png">
+<meta property="og:image" content="http://example.com/img/leveldb/key_structure.png">
 <meta property="article:published_time" content="2024-02-26T09:53:35.216Z">
-<meta property="article:modified_time" content="2024-02-26T10:02:54.790Z">
+<meta property="article:modified_time" content="2024-03-06T07:31:07.440Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="LevelDB源码分析">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/26/%E6%95%B0%E6%8D%AE%E5%BA%93/leveldb%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/leveldb%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%903-Memtable(1)/img/key_structure.png">
+<meta name="twitter:image" content="http://example.com/img/leveldb/key_structure.png">
   
   
   
@@ -322,7 +322,7 @@
 <h3 id="Memtable中的KV"><a href="#Memtable中的KV" class="headerlink" title="Memtable中的KV"></a>Memtable中的KV</h3><p>Memtable提供了写入KV记录，删除以及读取KV记录的接口，但是事实上**Memtable并不执行真正的删除操作,**删除某个Key的Value在Memtable内是作为插入一条记录实施的，但是会打上一个Key的删除标记，真正的删除操作在后面的 Compaction过程中。<br>Memtable中的核心数据结构是skiplist，KV对是根据Key排序的，leveldb在插入等操作时保证key的有序性。那么skiplist是如何组织KV数据条目的呢?</p>
 <ol>
 <li>InternalKey<br>InternalKey是一个复合概念，是有几个部分组合成的一个key，ParsedInternalKey就是对InternalKey分拆后的结果(本质是一个东西)<br>InternalKey是由User key + SequenceNumber + ValueType组合而成的<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">| <span class="hljs-keyword">User</span> <span class="hljs-title">key</span> (<span class="hljs-keyword">string</span>) | sequence <span class="hljs-keyword">number</span> (<span class="hljs-number">7</span> bytes) | value <span class="hljs-keyword">type</span> (<span class="hljs-number">1</span> byte) |<br></code></pre></td></tr></table></figure>
-<img src="./img/key_structure.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;" /></li>
+<img src="/img/leveldb/key_structure.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;"></li>
 </ol>
 <p><code>InternalKey</code> 按照 user key 从小到大，sequence number 从大到小进行排序。</p>
 <ol start="2">

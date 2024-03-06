@@ -23,16 +23,16 @@
 <meta property="og:site_name" content="BlackGhost">
 <meta property="og:description" content="可串行化在数据库系统中，事务是并发的，那么应该如何保证事务并发的正确性。比如说事务T1从A账户转账50到B账户，事务T2计算A账户和B账户的和，T1和T2是并发执行的，那么可能会存在事务T2计算的结果并不等于A+B的原本的和。 最容易理解的正确性保证就是串行调度，即不允许事务并发，所有事务排队，一个接着一个串行执行，其正确性是显然的，同时，执行效率低也是显然的。 为了提高数据库的执行效率，显然我们">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/2pl-1.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/lock-matrix.png">
-<meta property="og:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/isolation-level.png">
+<meta property="og:image" content="http://example.com/img/bustub/2pl-1.png">
+<meta property="og:image" content="http://example.com/img/bustub/lock-matrix.png">
+<meta property="og:image" content="http://example.com/img/bustub/isolation-level.png">
 <meta property="article:published_time" content="2024-03-05T15:36:06.378Z">
-<meta property="article:modified_time" content="2024-03-05T15:41:34.448Z">
+<meta property="article:modified_time" content="2024-03-06T07:14:24.000Z">
 <meta property="article:author" content="LiuZhaocheng">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="CMU_15445">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/2pl-1.png">
+<meta name="twitter:image" content="http://example.com/img/bustub/2pl-1.png">
   
   
   
@@ -321,7 +321,7 @@
 <h2 id="两阶段锁"><a href="#两阶段锁" class="headerlink" title="两阶段锁"></a><strong>两阶段锁</strong></h2><p>我们再以上面的转账为例。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs CQL">-- T1: 从 A 向 B 转账 100 元--<br>BEGIN<br>A = A - 100<br>B = B + 100<br>COMMIT<br>-- T2: 计算并输出 A、B 账户的总和 --<br>BEGIN<br>ECHO A + B<br>COMMIT<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/2pl-1.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/img/bustub/2pl-1.png" srcset="/img/loading.gif" lazyload></p>
 <p>我们先来看最左边的调度，我们看到事务二出现了不正确的结果，并且我们看到了出现了不正确结果的原因是由于事务T1过早地释放了A的独占锁。</p>
 <p>如果我们采用二阶段锁协议，要求每个事务分两个阶段提出加锁和解锁申请就不会出现这种结果。</p>
 <ol>
@@ -376,7 +376,7 @@
 <p>SIX 锁 &#x3D; S 锁 + IX 锁。对目标表加上 SIX 锁后，S 锁这一属性保证了别的事务能知道我们要读取目标表的所有 record，它们就不会去并发地更新任意的 record；IX 锁这一属性保证了别的事务能知道我们要更新目标表的一部分 record，它们就不会去并发地读取所有的 record。</p>
 </blockquote>
 <h2 id="锁兼容矩阵-1"><a href="#锁兼容矩阵-1" class="headerlink" title="锁兼容矩阵"></a><strong>锁兼容矩阵</strong></h2><p>锁的兼容矩阵如下：</p>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/lock-matrix.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;">
+<img src="/img/bustub/lock-matrix.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;">
 
 <p>我在这里尝试解释一下这个兼容矩阵。</p>
 <p>对于IS锁，它读取某一张表下的某一些tuple，对需要读取的才加S锁，所以IS锁与IS，S兼容，这是显而易见的；IS还与IX兼容，因为我们不确定哪些tuple需要加相应类型的锁(S或X)，这里在粗粒度上还是可以并发的，不冲突，下面是否冲突就交给tuple级别进行兼容矩阵的判断(tuple级别只能加S或X型锁)。</p>
@@ -390,7 +390,7 @@
 <li><p><strong>幻读</strong>：幻读是针对数据<strong>插入（INSERT）</strong>操作来说的。假设事务A对某些行的内容作了更改，但是还未提交，此时事务B插入了与事务A更改前的记录相同的记录行，并且在事务A提交之前先提交了，而这时，在事务A中查询，会发现好像刚刚的更改对于某些数据未起作用，但其实是事务B刚插入进来的，让用户感觉很魔幻，感觉出现了幻觉，这就叫幻读。</p>
 </li>
 </ol>
-<img src="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/Bustub%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/isolation-level.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
+<img src="/img/bustub/isolation-level.png" srcset="/img/loading.gif" lazyload style="zoom:50%;">
 
 
 
