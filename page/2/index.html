@@ -255,15 +255,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
-          管道的实现
+        <a href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV%E4%B8%AD%E7%9A%84Snapshot/" target="_self">
+          TinyKV中的Snapshot
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E7%AE%A1%E9%81%93%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV%E4%B8%AD%E7%9A%84Snapshot/" target="_self">
         <div>
-          管道的实现1int pipe(int*);  在Linux中，一切皆文件，管道也是一种文件！ 我们来看在xv6中，管道究竟是如何被实现的。我们直接来看sys_pipe函数。 我们首先获取到传进来的数组fdarray，这是数组在进程地址空间中虚拟地址，然后就调用pipealloc向向操作系统内核申请两个文件。  struct file是操作系统管理的，而文件描述符则是进程所有的。操作系统有一个fta
+          raft节点如何自动compact自己的entries日志对于一个长期运行的服务器来说，永远记住完整的Raft日志是不现实的。相反，服务器会检查Raft日志的数量，并不时地丢弃超过阈值的日志。一般来说，Snapshot 只是一个像 AppendEntries 一样的 Raft 消息，用来复制数据给 Follower，不同的是它的大小，Snapshot 包含了某个时间点的整个状态机数据，一次性建立和
         </div>
       </a>
 
@@ -271,8 +271,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-08-24 11:55" pubdate>
+              2024-08-24
             </time>
           </div>
         
@@ -287,12 +287,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/" class="category-chain-item">分布式系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/" class="category-chain-item">TinyKV</a>
   
   
 
@@ -309,9 +309,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">#分布式系统</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/TinyKV/">#TinyKV</a>
             
           </div>
         
@@ -325,15 +325,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
-          文件系统的构建
+        <a href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1Percolator%E6%A8%A1%E5%9E%8B/" target="_self">
+          Percolator事务模型原理
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%84%E5%BB%BA/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1Percolator%E6%A8%A1%E5%9E%8B/" target="_self">
         <div>
-          xv6文件系统的构建我们再次回到如何通过qemu启动xv6操作系统的问题，qemu的命令是： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-
+          Percolator事务模型原理TinyKV中的Percolator实现需要PD模块提供两个时间戳，一个是事务刚开始的时候需要一个时间戳在data列和lock列进行写入，还有一个时间戳是事物的提交时间戳。比如如果我们想实现一个客户端，我们首先需要联系PD模块获取region信息和一个开始时间戳，然后根据region对需要进行修改的KV进行分组，向每一个region所在的leader发送一个PreW
         </div>
       </a>
 
@@ -341,8 +341,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-08-24 11:55" pubdate>
+              2024-08-24
             </time>
           </div>
         
@@ -357,12 +357,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/" class="category-chain-item">分布式系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/" class="category-chain-item">TinyKV</a>
   
   
 
@@ -379,9 +379,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">#分布式系统</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/TinyKV/">#TinyKV</a>
             
           </div>
         
@@ -395,15 +395,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
-          xv6的启动
+        <a href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV-P4%EF%BC%9APercolator%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          Percolator代码实现
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E5%90%AF%E5%8A%A8/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV-P4%EF%BC%9APercolator%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
         <div>
-          xv6启动(1)我们的xv6操作系统是运行在qemu模拟器上的，如果我想要知道究竟是如何启动这个操作系统的，那么我就要知道是如何启动qemu,并传入一些什么参数的。通过make -nB，有如下命令： 1qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 3 -nographic -drive
+          TinyKV中的Percolator代码实现
         </div>
       </a>
 
@@ -411,8 +411,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-08-24 11:55" pubdate>
+              2024-08-24
             </time>
           </div>
         
@@ -427,12 +427,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/" class="category-chain-item">分布式系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/" class="category-chain-item">TinyKV</a>
   
   
 
@@ -449,9 +449,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">#分布式系统</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/TinyKV/">#TinyKV</a>
             
           </div>
         
@@ -465,15 +465,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
-          Shell
+        <a href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV-P2%EF%BC%9ARaft%E6%A8%A1%E5%9D%97/" target="_self">
+          TinyKV-Raft
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Ashell/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/TinyKV-P2%EF%BC%9ARaft%E6%A8%A1%E5%9D%97/" target="_self">
         <div>
-          shell这部分的笔记主要来源于user/sh.c文件，这里面有很多代码的技巧，很值得学习。这部分主要弄清楚xv6中的shell是如何工作的。  一条完整的命令是如何开始运行的 是如何实现重定向的  （ &gt; 符号) 是如何执行管道命令的  （ | 符号） 以及List命令，后台执行等。  首先sh程序会打开三次console 文件，使得0,1,2三个文件描述符都指向console 。然后就可
+          
         </div>
       </a>
 
@@ -481,8 +481,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-08-24 11:55" pubdate>
+              2024-08-24
             </time>
           </div>
         
@@ -497,12 +497,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/" class="category-chain-item">分布式系统</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/TinyKV/" class="category-chain-item">TinyKV</a>
   
   
 
@@ -519,9 +519,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">#分布式系统</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/TinyKV/">#TinyKV</a>
             
           </div>
         
@@ -535,15 +535,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
-          Printf的实现
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
+          P3实验笔记
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Aprintf%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P3%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
         <div>
-          printf函数的实现在介绍printf 函数之前，我们先要来了解一下C语言里面是如何实现边长参数的。printf 正是通过变长参数来实现格式化的打印的。 C 可变参数声明方式为： 1int func (int arg1, ...);  其中... 表示可变参数列表。 请注意，函数 func() 最后一个参数写成省略号，即三个点号（**…**），省略号之前的那个参数是 int，代表了要传递的可变参
+          Query Execution从这一个实验开始，我们就正式进入了Bustub数据库的底层实现部分。这个实验完成后，我们利用我们实现的算子，可以在本机进行SQL语句的查询。 SQL语句的执行Parser 一条 sql 语句，首先经过 Parser 生成一棵抽象语法树 AST。Bustub 中采用了 libpg_query 库将 sql 语句 parse 为 AST。这个地方主要运用的是编译原理的内容
         </div>
       </a>
 
@@ -551,8 +551,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -567,12 +567,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -589,9 +589,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -605,15 +605,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
-          Fork&amp;&amp;Execve的实现
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P4%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
+          P4实验笔记
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9Afork&amp;&amp;execve/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P4%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
         <div>
-          Fork我们来看一下fork函数是如何实现的，fork是完全把父进程的状态机复制了一份。 首先，先获取当前进行系统调用的线程，然后再allocproc申请一个新的进程。在xv6操作系统中，进程的管理是一个proc数组。 12345678910int fork(void)&#123;  int i, pid;  struct proc *np;  struct proc *p = myproc();
+          OverviewP4需要完成以下任务：  Lock Manager：锁管理器，利用 2PL 实现并发控制。支持 REPEATABLE_READ、READ_COMMITTED 和 READ_UNCOMMITTED 三种隔离级别，支持 SHARED、EXCLUSIVE、INTENTION_SHARED、INTENTION_EXCLUSIVE 和 SHARED_INTENTION_EXCLUSIVE 五
         </div>
       </a>
 
@@ -621,8 +621,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:05" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -637,12 +637,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" class="category-chain-item">xv6代码阅读</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -659,9 +659,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/">#xv6代码阅读</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -675,15 +675,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
-          锁的实现
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(2)/" target="_self">
+          P2实验笔记(2)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(2)/" target="_self">
         <div>
-          自旋锁（Spin lock）的实现 什么是自旋锁自旋锁是一种忙等待的锁机制。锁的特性就是只有一个进程可以获取锁，在任何时间点都不能有超过一个锁的持有者。在acquire里面有一个死循环，循环中判断锁对象的locked字段是否为0，如果为0那表明当前锁没有持有者，当前对于acquire的调用可以获取锁。之后我们通过设置锁对象的locked字段为1来获取锁。最后返回。   但两个进程可能同时读到 lo
+          Overview第一部分是设计好遍历B+树的迭代器，第二部分是实现B+树的并发。 B+树中的并发控制我们会使用一种特殊的加锁方式，叫做 latch crabbing。顾名思义，就像螃蟹一样，移动一只脚，放下，移动另一只脚，再放下。基本思想是： 1. 先锁住 parent page， 2. 再锁住 child page， 3. 假设 child page 是安全的，则释放 parent page 的
         </div>
       </a>
 
@@ -691,8 +691,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -707,12 +707,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -729,9 +729,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -745,15 +745,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
-          线程切换(2)
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/" target="_self">
+          P2实验笔记(1)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A22/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P2%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0(1)/" target="_self">
         <div>
-          线程切换过程中锁的限制 在线程切换的过程中需要一直持有p-&gt;lock  防止两个CPU核使用同一个栈运行同一个线程   XV6中，不允许进程在执行switch函数的过程中，持有任何其他的锁。  防止死锁。示例：如果xv6在内核中关闭了中断，P1的内核线程持有了p-&gt;lock以外的其他锁，这些锁可能是在使用磁盘，UART，console过程中持有的。之后内核线程在持有锁的时候，通过调用s
+          Overview写这篇文章的目的主要用于B+树实现过程中的一些总结，不会太多涉及代码的实现，主要介绍思路和结构。个人感觉这是整个课程实验中最难的一个实验了。早就听说数据库中常用B+树来做索引，现在终于有机会直观地了解这一部分了。 这篇文章主要介绍CheckPoint1的内容。下一篇文章介绍B+树中的并发。 B+树的结构B+树中有两种节点，一种是InternalPage，另一种是LeafPage。这
         </div>
       </a>
 
@@ -761,8 +761,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -777,12 +777,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -799,9 +799,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -815,15 +815,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
-          线程切换(1)
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P1%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
+          P1实验笔记
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A21/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P1%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
         <div>
-          xv6中的线程一个线程可以认为是串行执行代码的单元。  内核线程的概念，对于每个用户进程都有一个内核线程来执行来自用户进程的系统调用。所有的内核线程都共享了内核内存，所以XV6的内核线程的确会共享内存。 每一个用户进程都有独立的内存地址空间，并且包含了一个线程，这个线程控制了用户进程代码指令的执行。所以XV6中的用户线程之间没有共享内存，你可以有多个用户进程，但是每个用户进程都是拥有一个线程的独立
+          Extendible Hash Table我们先来了解一下什么是Extendible Hash Table。Extendible Hashing 有两个主要的部分  目录(Directories): 即我们的哈希数组,目录的一个slot(即一个元素,下标)存储一个指向叶的地址的指针。还有一个id被分配给每个目录项,当目录扩张的时候,id就会发生改变。 叶(bucket): 桶用来存储散列后的数据(
         </div>
       </a>
 
@@ -831,8 +831,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -847,12 +847,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -869,9 +869,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -885,15 +885,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
-          系统调用和trap
+        <a href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P0%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
+          P0实验笔记
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/02/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8Ctrap/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/05/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU_15445/P0%E5%AE%9E%E9%AA%8C%E7%AC%94%E8%AE%B0/" target="_self">
         <div>
-          简单介绍这篇笔记主要帮助回顾xv6是如何经过trap陷入到内核去的，介绍相关的代码的重要的细节。  重要的寄存器   SATP（Supervisor Address Translation and Protection）：它包含了指向page table的物理内存地址 STVEC（Supervisor Trap Vector Base Address Register）：它指向了内核中处理trap
+          前置知识书到用时方恨少，这个Project虽说前缀树我在之前就学过，但C++的基础知识还是很不牢固，所以先把一些需要用的知识点要在这里再记一下。 左值引用和右值引用 左值是可以放在赋值号左边的，左值必须要在内存中有实体。 右值出现在赋值号右边；右值可以在寄存器也可以在内存中。  123int num = 10;int &amp;b = num;int &amp;c = 10; // 错误 上面。n
         </div>
       </a>
 
@@ -901,8 +901,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2024-02-29 14:04" pubdate>
-              2024-02-29
+            <time datetime="2024-03-05 23:36" pubdate>
+              2024-03-05
             </time>
           </div>
         
@@ -917,12 +917,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
     <span>></span>
     
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/xv6-labs/" class="category-chain-item">xv6-labs</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/CMU-15445/" class="category-chain-item">CMU_15445</a>
   
   
 
@@ -939,9 +939,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
             
-              <a href="/tags/xv6-labs/">#xv6-labs</a>
+              <a href="/tags/CMU-15445/">#CMU_15445</a>
             
           </div>
         
@@ -953,7 +953,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/#board">8</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/#board">9</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

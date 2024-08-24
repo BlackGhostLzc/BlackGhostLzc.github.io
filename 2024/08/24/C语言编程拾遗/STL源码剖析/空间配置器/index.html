@@ -1,0 +1,820 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="空间配置器SGI STL有2个种空间配置器：  std::allocator，符合STL标准，但很少使用，也不建议使用。因为只是把::operator new和::operator delete做了一层薄薄封装，效率差。 std::alloc，SGI特殊空间配置器，将配置器分为两级，兼顾了效率与内存碎片问题，效率高。推荐使用。  下面主要讲的也是std::alloc。 一般而言，我们所习惯的C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="空间配置器">
+<meta property="og:url" content="http://example.com/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="空间配置器SGI STL有2个种空间配置器：  std::allocator，符合STL标准，但很少使用，也不建议使用。因为只是把::operator new和::operator delete做了一层薄薄封装，效率差。 std::alloc，SGI特殊空间配置器，将配置器分为两级，兼顾了效率与内存碎片问题，效率高。推荐使用。  下面主要讲的也是std::alloc。 一般而言，我们所习惯的C++">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/free-list-1.png">
+<meta property="og:image" content="http://example.com/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/free-list-2.png">
+<meta property="article:published_time" content="2024-08-24T03:56:01.657Z">
+<meta property="article:modified_time" content="2024-08-24T04:04:02.377Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="C语言编程拾遗">
+<meta property="article:tag" content="STL源码剖析">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/free-list-1.png">
+  
+  
+  
+  <title>空间配置器 - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="空间配置器"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-24 11:56" pubdate>
+          2024年8月24日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          94 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">空间配置器</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="空间配置器"><a href="#空间配置器" class="headerlink" title="空间配置器"></a>空间配置器</h2><p>SGI STL有2个种空间配置器：</p>
+<ol>
+<li><code>std::allocator</code>，符合STL标准，但很少使用，也不建议使用。因为只是把<code>::operator new</code>和<code>::operator delete</code>做了一层薄薄封装，效率差。</li>
+<li><code>std::alloc</code>，SGI特殊空间配置器，将配置器分为两级，兼顾了效率与内存碎片问题，效率高。推荐使用。</li>
+</ol>
+<p>下面主要讲的也是<code>std::alloc</code>。</p>
+<p>一般而言，我们所习惯的C++内存配置操作和释放是这样的：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Foo</span> &#123; ... &#125;;<br>Foo* f = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Foo</span>();<br><span class="hljs-keyword">delete</span> f;<br></code></pre></td></tr></table></figure>
+<p>其中<code>new</code>算式内涵两阶段操作：</p>
+<ol>
+<li>调用<code>::operator new</code>配置内存</li>
+<li>调用<code>Foo::Foo()</code>构造对象内容</li>
+</ol>
+<p>delete也有两阶段操作</p>
+<ol>
+<li>调用<code>Foo::~Foo()</code>将对象析构</li>
+<li>调用<code>::operator delete</code>释放内存</li>
+</ol>
+<p>为了精密分工，STL allocator决定将这两阶段操作区分开来。</p>
+<ol>
+<li>内存配置由<code>alloc::allocate()</code>负责，内存释放由<code>alloc::deallocate()</code>负责。(头文件&lt;stl_alloc.h&gt;)</li>
+<li>对象构造由<code>::construct()</code>负责，对象析构由<code>::destroy()</code>负责。(头文件&lt;stl_construct.h&gt;)</li>
+</ol>
+<h2 id="头文件说明"><a href="#头文件说明" class="headerlink" title="头文件说明"></a>头文件说明</h2><p>STL标准规定，配置器定义于<memory>，而SGI <memory> 内含3个与配置器相关的文件：</memory></memory></p>
+<ol>
+<li>&lt;stl_construct.h&gt; 定义了全局函数construct(), destroy(), 负责对象的构造和析构。隶属于STL标准规范。</li>
+<li>&lt;stl_alloc.h&gt; 定义了一、二级配置器，彼此合作。配置器名为alloc。</li>
+<li>&lt;stl_uninitialized.h&gt; 定义一些全局函数，用来填充（fill）或复制（copy）大块内存数据。比如函数<code>un_initialized_copy()</code>、<code>un_initialized_fill()</code>、<code>un_initialized_fill_n()</code>。</li>
+</ol>
+<h2 id="构造和析构工具：construct-destroy"><a href="#构造和析构工具：construct-destroy" class="headerlink" title="构造和析构工具：construct, destroy"></a>构造和析构工具：construct, destroy</h2><p>全局函数construct(), destroy()在<strong>已配置内存的基础上</strong>，用于对象的构造和析构。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// &lt;stl_construct.h&gt;</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> _Construct(T1* p) &#123;<br>  <span class="hljs-keyword">new</span> ((<span class="hljs-type">void</span>*) p) <span class="hljs-built_in">T</span>(); <span class="hljs-comment">// placement new; 调用T::T()</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> T1, <span class="hljs-keyword">class</span> T2&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">construct</span><span class="hljs-params">(T1* p, <span class="hljs-type">const</span> T2&amp; value)</span> </span>&#123;<br>       <span class="hljs-keyword">new</span> (p) <span class="hljs-built_in">T1</span>(value); <span class="hljs-comment">// placement new; 调用T1::T1(value)</span><br>&#125;<br><br><span class="hljs-comment">// destroy()第一个版本, 接受一个指针</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">(T* pointer)</span> </span>&#123;<br>       pointer-&gt;~<span class="hljs-built_in">T</span>(); <span class="hljs-comment">// 调用dtor ~T()</span><br>&#125;<br><br><span class="hljs-comment">// 如果元素的数值型别(value type)有non-trivial destructor, 则派送(dispatch)到这里</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">ForwardIterator</span>&gt;<br><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> __destroy_aux(ForwardIterator first, ForwardIterator last,  __false_type) &#123;<br>       <span class="hljs-keyword">for</span> (; first &lt; last; ++first)<br>              <span class="hljs-built_in">destroy</span>(&amp;*first);<br>&#125;<br><br><span class="hljs-comment">// 如果元素的数值型别(value type)有trivial destructor, 则派送(dispatch)到这里</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">ForwardIterator</span>&gt;<br><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> __destroy_aux(ForwardIterator first, ForwardIterator last,  __true_type) &#123;<br>    <span class="hljs-comment">// 什么都没干</span><br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>代码中一组<code>__destroy()</code>是辅助实现<code>destroy()</code>的，编译器会在编译期根据萃取出参数的类型（value type）。接着萃取出trivial_destructor特性，判断是否支持<code>trivial_destructor</code>（<strong>平凡的析构函数，说明没有申请动态内存</strong>），如果支持（特性为__true_type），就不需要专门调用析构函数；如果不支持（特性为__false_type），就需要针对迭代器区间每个元素，逐个调用析构函数。如果迭代器区间包含元素较多，这能节省不少时间。</p>
+<blockquote>
+<p>当一个类的析构函数不需要做任何额外的工作时，我们称这个类的析构函数为trivial destructor,STL中有一个 has_trivial_destructor函数，这是编译器内置的，用来检测类型是否拥有用户自定义的析构函数。</p>
+</blockquote>
+<h2 id="空间的配置与释放"><a href="#空间的配置与释放" class="headerlink" title="空间的配置与释放"></a>空间的配置与释放</h2><p>std::alloc 负责内存的配置和释放。对象构造前的空间配置和对象析构后的空间释放，由&lt;stl_alloc.h&gt;负责<br>C++的内存配置基本操作<code>::operator new()</code>，内存释放基本操作<code>::operator delete()</code>。这2全局函数相当于C的<code>malloc()</code>和<code>free()</code>。SGI正是以<code>malloc()</code>和<code>free()</code>完成内存的配置与释放的，但SGI STL的<code>std::alloc</code>不能使用new&#x2F;delete，因为new&#x2F;delete会直接构造&#x2F;析构对象，而这不符合<code>std::alloc</code>职责。</p>
+<blockquote>
+<p>operator new只分配所要求的空间，不调用相关对象的构造函数。</p>
+</blockquote>
+<h3 id="std-alloc设计的基本思想"><a href="#std-alloc设计的基本思想" class="headerlink" title="std::alloc设计的基本思想"></a>std::alloc设计的基本思想</h3><p>为避免小型区块可能造成的内存碎片问题，SGI STL设计了双层级配置器：</p>
+<ol>
+<li>第一级配置器，直接使用<code>malloc()</code>, <code>free()</code>；</li>
+<li>第二级配置器，视情况采用不同策略：</li>
+</ol>
+<p>当配置区块 &gt; 128bytes时，视为“足够大”，便调用第一级配置器；<br>当配置区块 &lt;&#x3D; 128bytes时，视为“过小”，交给memory pool（内存池）来管理，不再求助于第一级配置器。<br>设计可以只开放第一级配置器，可以同时开启。<br>SGI STL的两级配置器：<code>__malloc_alloc_template</code>是第一级配置器，<code>__default_alloc_template</code>是第二级配置器。</p>
+<p>SGI STL容器全部使用这个simple_alloc接口。例如，vector的专属空间配置器data_allocator，就是simple_alloc&lt;value_type, Alloc&gt;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// &lt;stl_alloc.h&gt;</span><br><br><span class="hljs-comment">// 内部4个成员函数都是单纯的转发调用</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Alloc</span>&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">simple_alloc</span> &#123; <span class="hljs-comment">// simple_alloc包装第一级配置器和第二级配置器, 用户传入模板参数给Alloc即可</span><br><span class="hljs-keyword">public</span>:<br>       <span class="hljs-function"><span class="hljs-type">static</span> T* <span class="hljs-title">allocate</span><span class="hljs-params">(<span class="hljs-type">size_t</span> n)</span> </span>&#123; <span class="hljs-comment">// 配置n个单位T类型对象的原始空间</span><br>              <span class="hljs-keyword">return</span> <span class="hljs-number">0</span> == n ? <span class="hljs-number">0</span> : (T*)Alloc::<span class="hljs-built_in">allocate</span>(n * <span class="hljs-built_in">sizeof</span>(T));<br>       &#125;<br>       <span class="hljs-function"><span class="hljs-type">static</span> T* <span class="hljs-title">allocate</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> </span>&#123;     <span class="hljs-comment">// 配置1个单位T类型对象的原始空间</span><br>              <span class="hljs-keyword">return</span> (T*)Alloc::<span class="hljs-built_in">allocate</span>(<span class="hljs-built_in">sizeof</span>(T));<br>       &#125;<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">deallocate</span><span class="hljs-params">(T* p, <span class="hljs-type">size_t</span> n)</span> </span>&#123; <span class="hljs-comment">// 释放n个单位T类型对象的原始空间</span><br>              <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> != n) Alloc::<span class="hljs-built_in">deallocate</span>(p, n * <span class="hljs-built_in">sizeof</span>(T));<br>       &#125;<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">deallocate</span><span class="hljs-params">(T* p)</span> </span>&#123; <span class="hljs-comment">// 释放1个单位T类型对象的原始空间</span><br>              Alloc::<span class="hljs-built_in">deallocate</span>(p, <span class="hljs-built_in">sizeof</span>(T));<br>       &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="第一级配置器：-malloc-alloc-template"><a href="#第一级配置器：-malloc-alloc-template" class="headerlink" title="第一级配置器：__malloc_alloc_template"></a>第一级配置器：__malloc_alloc_template</h2><ol>
+<li>allocate() 直接使用malloc(), deallocate() 直接使用free()；</li>
+<li>模拟C++的set_new_handler()以处理内存不足的状况。</li>
+</ol>
+<h3 id="如何选择使用哪个配置器"><a href="#如何选择使用哪个配置器" class="headerlink" title="如何选择使用哪个配置器"></a>如何选择使用哪个配置器</h3><p>定义或取消宏__USE_MALLOC，就能决定alloc的实际类型（一级配置器 or 二级配置器）。SGI STL并未定义__USE_MALLOC，因此SGI默认使用的二级配置器。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta"># <span class="hljs-keyword">ifdef</span> __USE_MALLOC</span><br><br><span class="hljs-keyword">typedef</span> malloc_alloc alloc;<br><span class="hljs-keyword">typedef</span> malloc_alloc single_client_alloc;<br><br><span class="hljs-meta"># <span class="hljs-keyword">else</span></span><br>...<br><span class="hljs-keyword">typedef</span> __default_alloc_template&lt;__NODE_ALLOCATOR_THREADS, <span class="hljs-number">0</span>&gt; alloc;<br><span class="hljs-keyword">typedef</span> __default_alloc_template&lt;<span class="hljs-literal">false</span>, <span class="hljs-number">0</span>&gt; single_client_alloc;<br>...<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure>
+
+
+<h3 id="一级配置器实现"><a href="#一级配置器实现" class="headerlink" title="一级配置器实现"></a>一级配置器实现</h3><p>用<code>malloc()</code>, <code>free()</code>, <code>realloc()</code>等C函数执行实际的内存配置、释放、重新配置，并模拟实现类似于C++ new-handler异常处理机制。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// &lt;stl_alloc.h&gt;</span><br><br><span class="hljs-comment">// 以下是第一级配置</span><br><span class="hljs-comment">// 注意， 无&quot;template型别参数&quot;. 至于&quot;非型别参数&quot;inst, 则完全没派上用场</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">int</span> inst&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">__malloc_alloc_template</span> &#123;<br><br><span class="hljs-keyword">private</span>:<br>       <span class="hljs-comment">// 以下都是函数指针, 所代表的函数将用来处理内存不足的情况</span><br>       <span class="hljs-comment">// oom: out of memory.</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> *<span class="hljs-title">oom_malloc</span><span class="hljs-params">(<span class="hljs-type">size_t</span>)</span></span>;            <span class="hljs-comment">// 模拟C++ placement new, 不断尝试配置内存, 调用客户注册的处理例程或抛出异常</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> *<span class="hljs-title">oom_realloc</span><span class="hljs-params">(<span class="hljs-type">void</span>*, <span class="hljs-type">size_t</span>)</span></span>;    <span class="hljs-comment">// 模拟C++ placement new, 不断尝试重新配置内存, 调用客户注册的处理例程或抛出异常</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-title">void</span><span class="hljs-params">(*__malloc_alloc_oom_handler)</span><span class="hljs-params">()</span></span>; <span class="hljs-comment">// 保存客户注册的 内存不足处理例程</span><br><br><span class="hljs-keyword">public</span>:<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> *<span class="hljs-title">allocate</span><span class="hljs-params">(<span class="hljs-type">size_t</span> n)</span> </span>&#123;<br>              <span class="hljs-type">void</span> *result = <span class="hljs-built_in">malloc</span>(n); <span class="hljs-comment">// 第一级配置器直接使用malloc()</span><br>              <span class="hljs-comment">// 以下无法满足需求时, 改用oom_malloc()</span><br>              <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == result) result = <span class="hljs-built_in">oom_malloc</span>(n);<br>              <span class="hljs-keyword">return</span> result;<br>       &#125;<br><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">deallocate</span><span class="hljs-params">(<span class="hljs-type">void</span>* p, <span class="hljs-type">size_t</span> <span class="hljs-comment">/*n*/</span>)</span> </span>&#123;<br>              <span class="hljs-built_in">free</span>(p); <span class="hljs-comment">// 第一级配置器直接使用free()</span><br>       &#125;<br><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> *<span class="hljs-title">reallocate</span><span class="hljs-params">(<span class="hljs-type">void</span>* p, <span class="hljs-type">size_t</span> <span class="hljs-comment">/* old_sz */</span>, <span class="hljs-type">size_t</span> new_sz)</span> </span>&#123;<br>              <span class="hljs-type">void</span> *result = <span class="hljs-built_in">realloc</span>(p, new_sz); <span class="hljs-comment">// 第一级配置器直接使用realloc()</span><br>              <span class="hljs-comment">// 以下无法满足需求时, 改用oom_realloc()</span><br>              <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == result) result = <span class="hljs-built_in">oom_realloc</span>(p, new_sz);<br>              <span class="hljs-keyword">return</span> result;<br>       &#125;<br><br>       <span class="hljs-comment">// 以下仿真C++的set_new_handler(). 换句话说， 你可以通过它指定自己的out-of-memory handler</span><br>       <span class="hljs-comment">// 注册 内存不足处理例程</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-title">void</span><span class="hljs-params">(*set_malloc_handler(<span class="hljs-type">void</span>(*f)()))</span><span class="hljs-params">()</span> </span>&#123;<br>              <span class="hljs-built_in">void</span>(*old)() = __malloc_alloc_oom_handler;<br>              __malloc_alloc_oom_handler = f;<br>              <span class="hljs-keyword">return</span> old;<br>       &#125;<br>&#125;;<br><br><span class="hljs-comment">// malloc_alloc out-of-memory handling</span><br><span class="hljs-comment">// 初值0, 有待客户端设定</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">int</span> inst&gt;</span><br><span class="hljs-function"><span class="hljs-title">void</span><span class="hljs-params">(*__malloc_alloc_template&lt;inst&gt;::__malloc_alloc_oom_handler)</span><span class="hljs-params">()</span> </span>= <span class="hljs-number">0</span>;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">int</span> inst&gt;<br><span class="hljs-type">void</span>* __malloc_alloc_template&lt;inst&gt;::<span class="hljs-built_in">oom_malloc</span>(<span class="hljs-type">size_t</span> n) &#123;<br>    <span class="hljs-built_in">void</span>(*my_malloc_handler)();<br>    <span class="hljs-type">void</span>* result;<br>    <span class="hljs-keyword">for</span> (; ;) &#123; <span class="hljs-comment">// 循环尝试配置内存</span><br>        my_malloc_handler = __malloc_alloc_oom_handler;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == my_malloc_handler) &#123;<br>            __THROW_BAD_ALLOC;<br>        &#125;<br>        (*my_malloc_handler)(); <span class="hljs-comment">// 调用客户注册的处理例程, 企图释放内存</span><br>        result = <span class="hljs-built_in">malloc</span>(n);     <span class="hljs-comment">// 再次尝试配置内存</span><br>        <span class="hljs-keyword">if</span> (result) <span class="hljs-keyword">return</span> result;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">int</span> inst&gt;<br><span class="hljs-type">void</span>* __malloc_alloc_template&lt;inst&gt;::<span class="hljs-built_in">oom_realloc</span>(<span class="hljs-type">void</span>* p, <span class="hljs-type">size_t</span> n) &#123;<br>    <span class="hljs-built_in">void</span>(*my_malloc_handler)();<br>    <span class="hljs-type">void</span>* result;<br>    <span class="hljs-keyword">for</span> (; ;) &#123; <span class="hljs-comment">// 循环不断尝试释放、配置 ...</span><br>        my_malloc_handler = __malloc_alloc_oom_handler;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == my_malloc_handler) &#123; <span class="hljs-comment">// 如果客户没有设置my_malloc_handler, 就抛出异常</span><br>            __THROW_BAD_ALLOC;<br>        &#125;<br>        (*my_malloc_handler)();    <span class="hljs-comment">// 调用客户注册的处理例程, 企图释放内存</span><br>        result = <span class="hljs-built_in">reallocate</span>(p, n); <span class="hljs-comment">// 尝试重新配置内存</span><br>        <span class="hljs-keyword">if</span> (result) &#123;<br>            <span class="hljs-keyword">return</span> result;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// 注意, 以下直接将参数inst指定为0</span><br><span class="hljs-keyword">typedef</span> __malloc_alloc_template&lt;<span class="hljs-number">0</span>&gt; malloc_alloc;<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="第二级配置器：-default-alloc-template"><a href="#第二级配置器：-default-alloc-template" class="headerlink" title="第二级配置器：__default_alloc_template"></a>第二级配置器：__default_alloc_template</h2><p>与第一级配置器区别：为避免太多小额区块造成内存碎片，多了一些机制。</p>
+<p>SGI第二级配置做法：如果区块够大，&gt; 128bytes，移交给第一级配置器处理；当区块 &lt; 128bytes，则以内存池（memory pool）管理。</p>
+<p>这种方法称为<strong>次配置</strong>（sub-allocation）：每次配置一大块内存，并维护对应自由链表（free-list）。下次再有相同大小内存需求时，就直接从free-lists中取出。如果客户端归还小额区块，就由配置器<strong>回收到free-lists</strong>中。<br>简而言之，二级配置器负责内存配置、回收，会根据区块大小，选择自行配置，还是移交给一级配置器处理。</p>
+<p>因此，可以知道二级配置器多了<strong>自由链表</strong>和<strong>内存池</strong>两个机制，专门为处理 &lt;&#x3D; 128bytes的内存申请而生。</p>
+<h3 id="free-lists"><a href="#free-lists" class="headerlink" title="free-lists"></a>free-lists</h3><p>二级配置器的核心之一就是free-lists（自由链表），每个free-list代表一类空闲区块，大小从8，16，24，…，到128 （bytes），共16个。16个free-list的头结点，用一个数组<code>free_list[16]</code>表示，下文称之为槽位。每个槽位指向的区块是一个链表，而该区块就是链表的第一个空闲块。</p>
+<p>free-list的精髓就是联合体obj：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// free-lists节点结构</span><br><span class="hljs-keyword">union</span> <span class="hljs-title class_">obj</span> &#123;<br>    <span class="hljs-keyword">union</span> <span class="hljs-title class_">obj</span>* free_list_link;<br>    <span class="hljs-type">char</span> client_data[<span class="hljs-number">1</span>]; <span class="hljs-comment">/* The client sees this. */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>一般情况下，我们用next 和 data的struct来描述链表节点，而obj用obj<em>的union，这是为什么？</em><br>因为这样可以节省维护链表的指针空间。一个区块，在分配给客户端之前，首部大小为obj那部分可以看作一个指针free_list_link，用来串成链表；而分配给客户端之后，这部分无需当做指针，可以被客户按需使用；待客户归还区块时，首部大小为obj那部分又会被当做指针，用来串成链表，加入free list。<br>free_list_link所指向的内存区块大小，由链表头结点，即槽位所在free_list[]中的索引决定。而归还时，调用者会记录区块大小。因此，obj不需要额外存储区块大小。如下所示：</p>
+<img src="/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/free-list-1.png" srcset="/img/loading.gif" lazyload alt="deque" style="zoom: 33%;">
+
+<img src="/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/free-list-2.png" srcset="/img/loading.gif" lazyload alt="deque" style="zoom: 50%;">
+
+<h3 id="default-alloc-template-的数据结构"><a href="#default-alloc-template-的数据结构" class="headerlink" title="__default_alloc_template 的数据结构"></a>__default_alloc_template 的数据结构</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 第二级配置器的部分实现内容</span><br><span class="hljs-keyword">enum</span> &#123; __ALIGN = <span class="hljs-number">8</span> &#125;; <span class="hljs-comment">// 小型区块上调边界</span><br><span class="hljs-keyword">enum</span> &#123; __MAX_BYTES = <span class="hljs-number">128</span> &#125;; <span class="hljs-comment">// 小型区块的上限</span><br><span class="hljs-keyword">enum</span> &#123; __NFREELTISTS = __MAX_BYTES / __ALIGN &#125;; <span class="hljs-comment">// free-lists个数</span><br><br><span class="hljs-comment">// 以下是第二级配置器</span><br><span class="hljs-comment">// 注意, 无&quot;template型别参数&quot;, 且第二参数完全没派上用场</span><br><span class="hljs-comment">// 第一参数用于多线程环境. 本书不讨论多线程环境</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">bool</span> threads, <span class="hljs-type">int</span> inst&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">__default_alloc_template</span> &#123;<br><span class="hljs-keyword">private</span>:<br>       <span class="hljs-comment">// ROUND_UP() 将bytes上调至8的倍数</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">size_t</span> <span class="hljs-title">ROUND_UP</span><span class="hljs-params">(<span class="hljs-type">size_t</span> bytes)</span></span>;<br><br><span class="hljs-keyword">private</span>:<br>       <span class="hljs-comment">// free-lists节点结构</span><br>       <span class="hljs-keyword">union</span> <span class="hljs-title class_">obj</span> &#123;<br>              <span class="hljs-keyword">union</span> <span class="hljs-title class_">obj</span>* free_list_link;<br>              <span class="hljs-type">char</span> client_data[<span class="hljs-number">1</span>]; <span class="hljs-comment">/* The client sees this. */</span><br>       &#125;;<br><br><span class="hljs-keyword">private</span>:<br>       <span class="hljs-comment">// 16个free-lists</span><br>       <span class="hljs-type">static</span> obj* <span class="hljs-keyword">volatile</span> free_list[__NFREELTISTS];<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">size_t</span> <span class="hljs-title">FREELIST_INDEX</span><span class="hljs-params">(<span class="hljs-type">size_t</span> bytes)</span></span>;<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> *<span class="hljs-title">refill</span><span class="hljs-params">(<span class="hljs-type">size_t</span> n)</span></span>;<br>       <span class="hljs-comment">// 配置一大块空间, 可容纳nobjs个大小为&quot;size&quot;的区块</span><br>       <span class="hljs-comment">// 如果配置nobjs个区块有所不便, nobjs可能会降低</span><br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">char</span>* <span class="hljs-title">chunk_alloc</span><span class="hljs-params">(<span class="hljs-type">size_t</span> size, <span class="hljs-type">int</span> &amp;nobjs)</span></span>;<br><br>       <span class="hljs-comment">// Chunk allocation state</span><br>       <span class="hljs-type">static</span> <span class="hljs-type">char</span>* start_free; <span class="hljs-comment">// 内存池起始位置. 只在chunk_alloc()中变化</span><br>       <span class="hljs-type">static</span> <span class="hljs-type">char</span>* end_free;   <span class="hljs-comment">// 内存池结束位置. 只在chunk_alloc()中变化</span><br>       <span class="hljs-type">static</span> <span class="hljs-type">size_t</span> heap_size;<br><br><span class="hljs-keyword">public</span>:<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span>* <span class="hljs-title">allocate</span><span class="hljs-params">(<span class="hljs-type">size_t</span> n)</span> </span>&#123; <span class="hljs-comment">/* 详述于后*/</span> &#125;<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span>  <span class="hljs-title">deallocate</span><span class="hljs-params">(<span class="hljs-type">void</span>* p , <span class="hljs-type">size_t</span> n)</span> </span>&#123; <span class="hljs-comment">/* 详述于后*/</span> &#125;<br>       <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span>* <span class="hljs-title">reallocate</span><span class="hljs-params">(<span class="hljs-type">void</span>* p, <span class="hljs-type">size_t</span> old_sz, <span class="hljs-type">size_t</span> new_sz)</span></span>;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>二级配置器的<code>allocate()</code>源码如下:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// n must be &gt; 0</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> * <span class="hljs-title">allocate</span><span class="hljs-params">(<span class="hljs-type">size_t</span> n)</span> </span>&#123;<br>       obj* <span class="hljs-keyword">volatile</span>* my_free_list;<br>       obj* result;<br><br>       <span class="hljs-comment">// &gt;128, 调用第一级配置器</span><br>       <span class="hljs-keyword">if</span> (n &gt; (<span class="hljs-type">size_t</span>)__MAX_BYTES) &#123;<br>              <span class="hljs-keyword">return</span> (malloc_alloc::<span class="hljs-built_in">allocate</span>(n)); <span class="hljs-comment">// malloc_alloc即一级配置器 __malloc_alloc_template&lt;0&gt;</span><br>       &#125;<br><br>       <span class="hljs-comment">// 寻找16个free lists中适当的一个</span><br>       my_free_list = free_list + <span class="hljs-built_in">FREELIST_INDEX</span>(n);<br>       result = *my_free_list;<br><br>       <span class="hljs-keyword">if</span> (result == <span class="hljs-number">0</span>) &#123;<br>              <span class="hljs-comment">// 没找到可用的free list, 准备重新填充free list</span><br>              <span class="hljs-type">void</span> *r = <span class="hljs-built_in">refill</span>(<span class="hljs-built_in">ROUND_UP</span>(n)); <span class="hljs-comment">/* 后面详述 */</span><br>              <span class="hljs-keyword">return</span> r;<br>       &#125;<br><br>       <span class="hljs-comment">// 调整free list</span><br>       *my_free_list = result-&gt;free_list_link;<br>       <span class="hljs-keyword">return</span> (result);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>二级配置器额度<code>deallocate()</code>源码如下,就是把该<code>obj</code>放在相应free list的第一个位置上。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// p 不可以是0</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span>  <span class="hljs-title">deallocate</span><span class="hljs-params">(<span class="hljs-type">void</span>* p , <span class="hljs-type">size_t</span> n)</span> </span>&#123;<br>       obj* q = (obj*)p;<br>       obj* <span class="hljs-keyword">volatile</span> *my_free_list;<br><br>       <span class="hljs-comment">// &gt; 128调用第一级配置器</span><br>       <span class="hljs-keyword">if</span> (n &gt; (<span class="hljs-type">size_t</span>)__MAX_BYTES) &#123;<br>              malloc_alloc::<span class="hljs-built_in">deallocate</span>(p, n);<br>              <span class="hljs-keyword">return</span>;<br>       &#125;<br><br>       <span class="hljs-comment">// 寻找对应free list</span><br>       my_free_list = free_list + <span class="hljs-built_in">FREELIST_INDEX</span>(n);<br>       <span class="hljs-comment">// 调整free list, 回收区块</span><br>       q-&gt;free_list_link = *my_free_list;<br>       *my_free_list = q;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="refill函数重新填充free-list"><a href="#refill函数重新填充free-list" class="headerlink" title="refill函数重新填充free list"></a>refill函数重新填充free list</h3><p>在<code>allocate()</code>中，当发现合适的free list中并没有可用的空闲块时，就会调用<code>refill()</code>为free list重新填充空闲空间。新空间由<code>chunk_alloc()</code>完成，默认取自内存池。</p>
+<p><code>refill()</code> 默认向<code>chunk_alloc()</code>申请nobjs&#x3D;20个大小为n（假定n已经调整为8倍数）的（连续）内存空间，当然实际成功申请到多少个，需要根据实际情况决定，可通过nobjs传出值判断。可以肯定的是，如果有返回值（没有出现异常终止程序），那么至少会有一个大小为n的对象。<br><code>refill()</code>会得到一个连续空间，而把第一个大小n的对象返回给客户；至于剩余的空间，在按尺寸n找到合适的free list后，将剩余空间按链表形式加入free list。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 返回一个大小为n的对象, 并且有时候会为适当的free list增加节点</span><br><span class="hljs-comment">// 假设n已经适当上调至8的倍数</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-type">bool</span> threads, <span class="hljs-type">int</span> inst&gt;<br><span class="hljs-type">void</span>* __default_alloc_template&lt;threads, inst&gt;::<span class="hljs-built_in">refill</span>(<span class="hljs-type">size_t</span> n) &#123;<br>       <span class="hljs-type">int</span> nobjs = <span class="hljs-number">20</span>;<br><br>       <span class="hljs-comment">// 调用chunk_alloc(), 尝试取得nobjs个区块作为free list的新节点</span><br>       <span class="hljs-comment">// 注意参数nobjs是pass by reference</span><br>       <span class="hljs-type">char</span>* chunk = <span class="hljs-built_in">chunk_alloc</span>(n, nobjs); <br>       obj* <span class="hljs-keyword">volatile</span> *my_free_list; <span class="hljs-comment">// 2级指针, 指向free list链表头结点, 也位于free_list[]槽位上</span><br>       obj* result;<br>       obj *current_obj, *next_obj;<br>       <span class="hljs-type">int</span> i;<br><br>       <span class="hljs-comment">// 如果只获得一个区块, 这个区块就分配给调用者, free list无新节点</span><br>       <span class="hljs-keyword">if</span> (<span class="hljs-number">1</span> == nobjs) <span class="hljs-keyword">return</span> (chunk);<br><br>       <span class="hljs-comment">// 否则准备调整free list, 纳入新节点</span><br>       my_free_list = free_list + <span class="hljs-built_in">FREELIST_INDEX</span>(n);<br><br>       <span class="hljs-comment">// 以下在chunk空间内建立free list</span><br>       result = (obj*)chunk; <span class="hljs-comment">// 首部这一块准备返回给客户端</span><br><br>       <span class="hljs-comment">// 以下引导free list指向新配置的空间(取自内存池)</span><br>       *my_free_list = next_obj = (obj*)(chunk + n);<br><br>       <span class="hljs-comment">// 以下在chunk剩余空间(除去返回给客户的首部)上, 将free list的各节点串起来</span><br>       <span class="hljs-keyword">for</span> (i = <span class="hljs-number">1</span>; ; ++i) &#123; <span class="hljs-comment">// 从1开始, 因为第0个将返回给客户端</span><br>              current_obj = next_obj;<br>              next_obj = (obj*)((<span class="hljs-type">char</span>*)next_obj + n);<br>              <span class="hljs-keyword">if</span> (nobjs - <span class="hljs-number">1</span> == i) &#123;<br>                     current_obj-&gt;free_list_link = <span class="hljs-number">0</span>;<br>                     <span class="hljs-keyword">break</span>;<br>              &#125;<br>              <span class="hljs-keyword">else</span> &#123;<br>                     current_obj-&gt;free_list_link = next_obj;<br>              &#125;<br>       &#125;<br><br>       <span class="hljs-keyword">return</span> (result);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们看到这个<code>refill()</code>函数首先调用了<code>chunk_alloc()</code>函数，从内存池中申请20个大小为<code>n</code>的区块(可能少于20个，因为内存池可能容量不足，但会分配至少1个<code>obj</code>)，并把其中第一个区块传给<code>chunk</code>，另外的<code>nobjs - 1</code>个区块再添加到free-list中。</p>
+<p>内存池自身通过两个指针边界管理，<code>start_free</code> ~ <code>end_free</code>；而<code>heap_size</code>，表示总的向OS成功申请到的内存总量。需求的内存总量 total_bytes为<code>size * nobjs</code>，内存池剩余空间bytes_left为 <code>end_free - start_free</code>。</p>
+<ol>
+<li><p>当内存池剩余空间 &gt;&#x3D; 需求内存总量时，直接从内存池划扣（移动<code>start_free</code> 边界）。</p>
+</li>
+<li><p>当内存池剩余空间不能完全满足需求量，但足够供应一个（含）以上的区块需求。<br>我们知道，客户（<code>refill()</code>）通过<code>chunk_alloc()</code>申请内存的时候，实际上只需要一个区块，但会默认申请20个区块。也就是说，实际上最少只供应一个也能满足需求。但我们还是让内存池尽量满足客户需求，分配尽量多的区块数<code>nobjs = bytes_left / size</code>。这样，实际供应的总量为<code>size*nobjs</code>。同样地，从内存池划扣空间需要移动<code>start_free</code>边界。</p>
+</li>
+<li><p>当内存池剩余空间连一个区块都不能满足时，可能需要向OS申请内存（调用<code>malloc()</code>）。</p>
+</li>
+</ol>
+<p>会不会出现严重的内存碎片问题?</p>
+<p>不会的，因为之前用过的内存释放后会重新加入到free-list中，不会被<code>free</code>。也就是说这种小空间(小于128bytes)不会造成内存碎片的问题。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="category-chain-item">C语言编程拾遗</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" class="category-chain-item">STL源码剖析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="print-no-link">#C语言编程拾遗</a>
+      
+        <a href="/tags/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" class="print-no-link">#STL源码剖析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>空间配置器</div>
+      <div>http://example.com/2024/08/24/C语言编程拾遗/STL源码剖析/空间配置器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%B1%BB%E5%9E%8B%E8%90%83%E5%8F%96%E4%B8%8E%E8%BF%AD%E4%BB%A3%E5%99%A8/" title="迭代器设计">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">迭代器设计</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E5%BA%8F%E5%88%97%E5%BC%8F%E5%AE%B9%E5%99%A8/" title="序列式容器">
+                        <span class="hidden-mobile">序列式容器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

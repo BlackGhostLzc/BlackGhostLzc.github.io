@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="为什么要有萃取技术既然迭代器是一种智能指针，iterator也要对一个原生指针进行封装，而问题就来源于此，当我们需要这个原生指针所指向对象的类型的时候(比如声明变量)，我们应该怎么办。 Case1:对于函数的局部变量例如，有一个函数template&lt;class T&gt; void func (T iter),其中T是指向某个特定对象的指针，那么如果在func中需要指针指向对象类型的变量应该">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迭代器设计">
+<meta property="og:url" content="http://example.com/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%B1%BB%E5%9E%8B%E8%90%83%E5%8F%96%E4%B8%8E%E8%BF%AD%E4%BB%A3%E5%99%A8/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="为什么要有萃取技术既然迭代器是一种智能指针，iterator也要对一个原生指针进行封装，而问题就来源于此，当我们需要这个原生指针所指向对象的类型的时候(比如声明变量)，我们应该怎么办。 Case1:对于函数的局部变量例如，有一个函数template&lt;class T&gt; void func (T iter),其中T是指向某个特定对象的指针，那么如果在func中需要指针指向对象类型的变量应该">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-08-24T03:56:01.667Z">
+<meta property="article:modified_time" content="2024-08-24T04:04:02.377Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="C语言编程拾遗">
+<meta property="article:tag" content="STL源码剖析">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>迭代器设计 - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="迭代器设计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-24 11:56" pubdate>
+          2024年8月24日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          63 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">迭代器设计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="为什么要有萃取技术"><a href="#为什么要有萃取技术" class="headerlink" title="为什么要有萃取技术"></a>为什么要有萃取技术</h2><p>既然迭代器是一种智能指针，<code>iterator</code>也要对一个原生指针进行封装，而问题就来源于此，当我们需要这个原生指针所指向对象的类型的时候(比如声明变量)，我们应该怎么办。</p>
+<h3 id="Case1-对于函数的局部变量"><a href="#Case1-对于函数的局部变量" class="headerlink" title="Case1:对于函数的局部变量"></a>Case1:对于函数的局部变量</h3><p>例如，有一个函数<code>template&lt;class T&gt; void func (T iter)</code>,其中T是指向某个特定对象的指针，那么如果在<code>func</code>中需要指针指向对象类型的变量应该怎么办？<br>这种情况可以采用模版的参数推导机制。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T t)</span> </span>&#123;<br>    <span class="hljs-built_in">func_imple</span>(t, *t);  <span class="hljs-comment">// forward the task to func_impl</span><br>&#125;<br><br><span class="hljs-function">tempalte&lt;<span class="hljs-keyword">class</span> T, <span class="hljs-keyword">class</span> U&gt;</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func_impl</span><span class="hljs-params">(T t, U u)</span> </span>&#123;<br>    U temp;             <span class="hljs-comment">// got the type</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>通过模板的推导机制，我们轻而易举的或得了指针所指向的对象的类型，但是事情往往不那么简单。例如，如果我想把传递给func的这个指针参数所指的类型作为返回值，显然这个方法不能凑效了，这就是我们的case 2。</p>
+<h2 id="Case2-对于函数的返回值"><a href="#Case2-对于函数的返回值" class="headerlink" title="Case2:对于函数的返回值"></a>Case2:对于函数的返回值</h2><p>比如说我们想这样,我们可以在<code>func_impl</code>中把U作为返回值，但问题是用户需要调用的是<code>func</code>来返回这个指针所指向的相应型别。下面的<code>*T</code>是错误的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br>(*T) <span class="hljs-built_in">func</span>(T t) &#123;        <span class="hljs-comment">// wrong code!!!</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">func_impl</span>(t, *t);<br>&#125;<br><br><span class="hljs-function">tempalte&lt;<span class="hljs-keyword">class</span> T, <span class="hljs-keyword">class</span> U&gt;</span><br><span class="hljs-function">U <span class="hljs-title">func_impl</span><span class="hljs-params">(T t, U u)</span> </span>&#123;<br>    U temp;             <span class="hljs-comment">// got the type</span><br>    ....<br>    <span class="hljs-keyword">return</span> temp<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>解决方案</strong><br>可以定义一个<code>iterator</code>，在定义的时候为期指向的对象类型制定一个别名,如下,而后只要需要其指向的对象的类型，只要直接引用就好了。</p>
+<blockquote>
+<p>注意，关键词typename必须加上，用意在于告诉编译器这是一个型别，否则编译器不知道<code>MyIter&lt;T&gt;::valuetyepe</code>代表的是一个型别或是member function或者data member。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">MyIter</span>&#123;<br>    <span class="hljs-keyword">typedef</span> T value_type;<br>    T* ptr;<br>    <span class="hljs-built_in">MyIter</span>(T* p = <span class="hljs-number">0</span>) : <span class="hljs-built_in">ptr</span>(p) &#123;&#125;<br>    T&amp; <span class="hljs-keyword">operator</span>*() <span class="hljs-type">const</span> &#123;<span class="hljs-keyword">return</span> *ptr;&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> I&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">typename</span> I::value_type <span class="hljs-title">func</span><span class="hljs-params">(I iter)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> *iter;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>等等，还有问题。。。<br>并不是所有迭代器类型都是class type，原生指针就不是!<br>如果不是class type,就无法为它定义内嵌型别。<br>因为func如果是一个泛型算法，那么它也绝对要接受一个原生指针作为迭代器，但是显然，你无法让下面的代码编译通过：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-type">int</span> *p = <span class="hljs-keyword">new</span> <span class="hljs-built_in">int</span>(<span class="hljs-number">52</span>); <span class="hljs-comment">// 原生指针</span><br>cout&lt;&lt;<span class="hljs-built_in">func</span>(p)&lt;&lt;endl;  <span class="hljs-comment">// !!!Is there a int::value_type?? Wrong Code here</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>解决方案：模版偏特化</strong><br>如果class template拥有一个以上的template参数，我们可以针对其中某个(或数个，或全部)template参数进行特化工作。换句话说，我们可以再泛化设计中提供一个特化版本。<br>假如有一个class template如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">C</span>&#123; ... &#125;;<br></code></pre></td></tr></table></figure>
+<p>所谓的partial specialization的意思是：针对任何template参数更进一步的条件设置所涉及出来的一个特化版本。我们可以使上面的class template，使之接受一个形式如下的partial specialization:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">C</span>&lt;T*&gt; &#123; ... &#125;;<br></code></pre></td></tr></table></figure>
+<p>这个特化版本仅适用于“T为原生指针”的情况，T为原生指针便是T为任意类型的一个进一步的条件限制。</p>
+<p>有了这个模版偏特化的利器，我们可以解决前述“内嵌型别”未能解决的问题。先前的问题是，原生指针并非class,因此无法为它们定义内嵌型别，现在我们可以设计特化版本的迭代器。</p>
+<p>所以，我们设计一个专门的class template用来<strong>萃取</strong>迭代器的特性</p>
+<blockquote>
+<p>注意，value_type只是迭代器特性之一，而非全部。比如说还有difference_type,reference等</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C++">tempalte&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span> &#123; <span class="hljs-comment">// traits意为“特性”</span><br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::value_type   value_type;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>意思就是，如果I定义有自己的value_type,那么通过这个<strong>traits</strong>的作用，萃取出来的value_type就是I::value_type。也就是说，前面的<code>func()</code>可以改写成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">typename</span> iterator_traits&lt;I&gt;::<span class="hljs-function">value_type <span class="hljs-title">func</span><span class="hljs-params">(I iter)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> *iter;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>我们再为<code>iterator_traits</code>有一个偏特化版本,这就解决了原生指针不是class type的问题.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C++">tempalte&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;T*&gt; &#123; <span class="hljs-comment">// traits意为“特性”</span><br>    <span class="hljs-keyword">typedef</span> T   value_type;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>还不够！<br>我们需要声明一个value_type类型的左值，但是却给iterator_traits传递了一个const int<em>，显然结果有问题，于是，为const T</em>也另起炉灶。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;<span class="hljs-type">const</span> T*&gt; &#123;<br>    <span class="hljs-keyword">typedef</span> T value_type;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="设计迭代器"><a href="#设计迭代器" class="headerlink" title="设计迭代器"></a>设计迭代器</h2><p>常用的迭代器相应型别有五种,traits会很忠实地将原汁原味榨取出来。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span> &#123;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::iterator_category iterator_category;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::value_type value_type;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::difference_type difference_type;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::pointer pointer;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::reference reference;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="value-type"><a href="#value-type" class="headerlink" title="value_type"></a><strong>value_type</strong></h3><p>如上。</p>
+<h3 id="difference-type"><a href="#difference-type" class="headerlink" title="difference_type"></a><strong>difference_type</strong></h3><p>这用来表示两个迭代器之间的距离，它可以表示一个容器的最大容量，STL的<code>count()</code>其返回值就必须使用这个diffrence_type。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">typename</span> iterator_traits&lt;I&gt;::<span class="hljs-function">difference_type</span><br><span class="hljs-function"><span class="hljs-title">count</span><span class="hljs-params">(I first, I last, <span class="hljs-type">const</span> T&amp; value)</span></span>&#123;<br>    <span class="hljs-keyword">typename</span> iterator_traits&lt;I&gt;::difference_type n = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span>(; first != last; first++) &#123;<br>        <span class="hljs-keyword">if</span>(*first == value)<br>            n++;<br>    &#125;<br>    <span class="hljs-keyword">return</span> n;<br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">typename</span> iterator_traits&lt;I&gt;::<span class="hljs-function">difference_type </span><br><span class="hljs-function"><span class="hljs-title">count</span><span class="hljs-params">(I first, I last, <span class="hljs-type">const</span> T&amp; value)</span></span>&#123;<br>    <span class="hljs-keyword">typename</span> iterator_traits&lt;I&gt;::difference_type n = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span>(; first != last; first++) &#123;<br>        <span class="hljs-keyword">if</span>(*first == value)<br>            n++;<br>    &#125;<br>    <span class="hljs-keyword">return</span> n;<br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">iterator_traits</span>&lt;I*&gt; &#123;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-type">ptrdiff_t</span> difference_type;<br>&#125;<br><br><span class="hljs-comment">// typedef long int ptrdiff_t;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="reference"><a href="#reference" class="headerlink" title="reference"></a><strong>reference</strong></h3><p>迭代器分为两种：不允许改变“所指对象的内容”(const int* p)，允许改变“所指对象的内容”(int* p)。当我们对一个mutable iterator进行提领操作(解引用)时,不获得的不应该是右值，应该是一个左值，因为右值不能够被赋值操作。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-type">int</span>* pi = <span class="hljs-keyword">new</span> <span class="hljs-built_in">int</span>(<span class="hljs-number">5</span>);<br><span class="hljs-type">const</span> <span class="hljs-type">int</span>* pic = <span class="hljs-keyword">new</span> <span class="hljs-built_in">int</span>(<span class="hljs-number">9</span>);<br><br>*pi = <span class="hljs-number">7</span>; <span class="hljs-comment">//mutable iterators，获得左值，允许赋值</span><br>*pic = <span class="hljs-number">1</span>; <span class="hljs-comment">//constant iterator, 提领获得右值，不允许赋值</span><br></code></pre></td></tr></table></figure>
+<p>这里，reference type指的是迭代器封装对象的类型的引用。这个类型的出现主要是为了解决对指针进行解引用的时候，返回什么样的对象的问题。</p>
+<ul>
+<li>当p是一个mutable iterator时,如果value_type是T，那么*p的型别不应该是T，应该是T&amp;</li>
+<li>当p是一个constant iterator时,如果value_type是T，那么*p的型别不应该是const T，应该是const T&amp;</li>
+</ul>
+<h3 id="pointer-type"><a href="#pointer-type" class="headerlink" title="pointer_type"></a><strong>pointer_type</strong></h3><p>C++中指针和引用总是有着密切的关系。如果我们想返回迭代器封装的对象的地址，就需要用到这里的pointer_type。<br>我们把reference_type和pointer_type这两个相应型别分别加入traits:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span> &#123; <br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::pointer pointer;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::reference reference;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;   <span class="hljs-comment">// 针对原生指针而设计的偏特化版</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;T*&gt; &#123;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> T* pointer;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> T&amp; reference;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;   <span class="hljs-comment">// 针对原生的pointer-to-const而设计的偏特化版</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;T*&gt; &#123;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> T* pointer;<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> T&amp; reference;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="iterator-category"><a href="#iterator-category" class="headerlink" title="iterator_category"></a><strong>iterator_category</strong></h3><p>在STL中，共有以下5种迭代器类型：</p>
+<ul>
+<li>Input Iterator: 只读</li>
+<li>Output Iterator: 只写</li>
+<li>Forward Iterator: 读写 </li>
+<li>Bidirectional Iterator: 可双向移动</li>
+<li>Random Access Iterator: 支持p+n,p-n,p[n],p1-p2,p1&lt;p2</li>
+</ul>
+<p>在STL的各种算法中，遍历元素是很常用的，于是我们就用<code>advance()</code>这个函数作个例子，看看每个迭代器的类型，这个函数负责把迭代器移动特定的长度：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-comment">// The input iterator version, an O(N) algorithm </span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">InputIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span>&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Advance_II</span><span class="hljs-params">(InputIteraotr&amp; i, Distance n)</span> </span>&#123;<br>    <span class="hljs-keyword">while</span>(n--) i++; <span class="hljs-comment">// This is step by step moving</span><br>&#125;<br><br><span class="hljs-comment">// The bidirectional iterator version, an O(N) algorithm</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">BidirectionalIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span>&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Advance_BI</span><span class="hljs-params">(BidirectionalIterator&amp; i, Distance n)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(n &gt;= <span class="hljs-number">0</span>)<br>        <span class="hljs-keyword">while</span>(n--) i++;<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">while</span>(n++) i++;<br>&#125;<br><br><span class="hljs-comment">// The random access version, an O(1) algorithm</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">RandomAccessIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span>&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Advance_RAI</span><span class="hljs-params">(RandomAccessIterator&amp; i, Distance n)</span> </span>&#123;<br>    i += n;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>最后，我们可以构想一个把这3个函数封装起来的函数<code>advance</code>，专门负责迭代器的移动。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">InputIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span>&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">advance</span><span class="hljs-params">(InputIterator&amp; I, Distance n)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(<span class="hljs-built_in">is_ramdom_access_iterator</span>(i)) <span class="hljs-comment">// How to judge?</span><br>        <span class="hljs-built_in">advance_RAI</span>(I, i);<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-built_in">is_bidirectional_iterator</span>(i)) <span class="hljs-comment">// How to judge?</span><br>        <span class="hljs-built_in">Advance_BI</span>(I, i);<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">Advance_II</span>(I, i);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果traits有能力萃取出迭代器的种类，我们便可以利用这个“迭代器类型相应型别”作为<code>advance</code>的第三个参数。这个相应型别一定必须是一个class type，因为编译器需要仰赖它进行重载决议。下面定义的5个class，代表五种迭代器类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-comment">// five tag classes</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">input_iterator_tag</span> &#123; &#125;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">output_iterator_tag</span> &#123; &#125;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">forward_iterator_tag</span> : <span class="hljs-keyword">public</span> input_iterator_tag &#123; &#125;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">bidirectional_iterator_tag</span> : <span class="hljs-keyword">public</span> forward_iterator_tag &#123; &#125;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">random_access_tag</span> : <span class="hljs-keyword">public</span> bidirectional_iterator_tag &#123; &#125;<br></code></pre></td></tr></table></figure>
+
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">InputIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span>&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">advance</span><span class="hljs-params">(InputIterator&amp; i, Distance n)</span> </span>&#123;<br>    <span class="hljs-comment">// Forward the correct messages</span><br>    __advance(i, n, type_traits&lt;i&gt;::<span class="hljs-built_in">iterator_category</span>());<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>为了满足上述行为，traits必须再增加一个相应的型别</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span> &#123;<br>    ...<br>    <span class="hljs-keyword">typedef</span> <span class="hljs-keyword">typename</span> I::iterator_category  iterator_category;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;T*&gt; &#123;<br>    ...<br>    <span class="hljs-comment">// 注意，原生指针是一种 Random Access Iterator</span><br>    <span class="hljs-keyword">typedef</span> random_access_iterator_tag  iterator_category;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">I</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">iterator_traits</span>&lt;<span class="hljs-type">const</span> T*&gt; &#123;<br>    ...<br>    <span class="hljs-comment">// 注意，原生pointer-to-const是一种 Random Access Iterator</span><br>    <span class="hljs-keyword">typedef</span> random_access_iterator_tag  iterator_category;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>设计适当的相应型别，是迭代器的责任，设计适当的迭代器，是容器的责任。唯容器本身，才知道设计什么类型的迭代器访问自己，并执行各种行为。</p>
+<p>在STL中，所有的迭代器都遵从上面的设计原则，都要提供上面说过的五种类型，但是，人总会有挂一漏万的时候，为了设计上的方便，STL提供了一个标准的迭代器壳：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Category</span>,<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>,<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Distance</span> = <span class="hljs-type">ptrdiff_t</span><br><span class="hljs-keyword">class</span> Pointer = T*<br><span class="hljs-keyword">class</span> Reference = T&amp;&gt;<br><span class="hljs-keyword">struct</span> iterator &#123;<br>    <span class="hljs-keyword">typedef</span> Category iterator_category;<br>    <span class="hljs-keyword">typedef</span> T       value_type;<br>    <span class="hljs-keyword">typedef</span> Distance difference_type;<br>    <span class="hljs-keyword">typedef</span> Pointer  pointer;<br>    <span class="hljs-keyword">typedef</span> Reference reference;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>这样就免去了声明这些类型的麻烦，当你想自定义一个迭代器的时候：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">Item</span>&gt;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">MyIter</span> : <span class="hljs-keyword">public</span> std::iterator&lt;std::forward_iterator_tag, Item&gt; &#123; … &#125;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="category-chain-item">C语言编程拾遗</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" class="category-chain-item">STL源码剖析</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="print-no-link">#C语言编程拾遗</a>
+      
+        <a href="/tags/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" class="print-no-link">#STL源码剖析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>迭代器设计</div>
+      <div>http://example.com/2024/08/24/C语言编程拾遗/STL源码剖析/类型萃取与迭代器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/C++/C++%E9%9D%A2%E7%BB%8F/" title="C++面经">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">C++面经</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/STL%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E5%99%A8/" title="空间配置器">
+                        <span class="hidden-mobile">空间配置器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

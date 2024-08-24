@@ -1,0 +1,815 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="LiuZhaocheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="什么是左值和右值左值可以取地址、位于等号左边；而右值没法取地址，位于等号右边。 比如: 12int a &#x3D; 5;A b &#x3D; A();  &#x2F;&#x2F;A是一个类  其中a和b是左值，5和A()是右值。 左值引用和右值引用引用本质是别名，可以通过引用修改变量的值，传参时传引用可以避免拷贝，其实现原理和指针类似。  左值引用能指向左值，不能指向右值的就是左值引用 123int a &#x3D; 5;int &amp;re">
+<meta property="og:type" content="article">
+<meta property="og:title" content="左值右值">
+<meta property="og:url" content="http://example.com/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/C++/%E5%B7%A6%E5%80%BC%E5%8F%B3%E5%80%BC/index.html">
+<meta property="og:site_name" content="BlackGhost">
+<meta property="og:description" content="什么是左值和右值左值可以取地址、位于等号左边；而右值没法取地址，位于等号右边。 比如: 12int a &#x3D; 5;A b &#x3D; A();  &#x2F;&#x2F;A是一个类  其中a和b是左值，5和A()是右值。 左值引用和右值引用引用本质是别名，可以通过引用修改变量的值，传参时传引用可以避免拷贝，其实现原理和指针类似。  左值引用能指向左值，不能指向右值的就是左值引用 123int a &#x3D; 5;int &amp;re">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-08-24T03:56:30.607Z">
+<meta property="article:modified_time" content="2024-08-24T04:04:02.377Z">
+<meta property="article:author" content="LiuZhaocheng">
+<meta property="article:tag" content="C语言编程拾遗">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>左值右值 - BlackGhost</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"rf58AIeHmmotgNL9dnMu6LKO-gzGzoHsz","app_key":"E0IuHsfDJv0eRp4u5OsHf22u","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlackGhost</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="左值右值"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-24 11:56" pubdate>
+          2024年8月24日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          41 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span>次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">左值右值</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="什么是左值和右值"><a href="#什么是左值和右值" class="headerlink" title="什么是左值和右值"></a>什么是左值和右值</h2><p>左值<strong>可以取地址、位于等号左边</strong>；而右值<strong>没法取地址，位于等号右边</strong>。</p>
+<p>比如:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br>A b = <span class="hljs-built_in">A</span>();  <span class="hljs-comment">//A是一个类</span><br></code></pre></td></tr></table></figure>
+
+<p>其中<code>a</code>和<code>b</code>是左值，5和<code>A()</code>是右值。</p>
+<h2 id="左值引用和右值引用"><a href="#左值引用和右值引用" class="headerlink" title="左值引用和右值引用"></a>左值引用和右值引用</h2><p>引用本质是别名，可以通过引用修改变量的值，传参时传引用可以避免拷贝，其实现原理和指针类似。 </p>
+<h3 id="左值引用"><a href="#左值引用" class="headerlink" title="左值引用"></a>左值引用</h3><p><strong>能指向左值，不能指向右值的就是左值引用</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br><span class="hljs-type">int</span> &amp;ref_a = a; <span class="hljs-comment">// 左值引用指向左值，编译通过</span><br><span class="hljs-type">int</span> &amp;ref_a = <span class="hljs-number">5</span>; <span class="hljs-comment">// 左值引用指向了右值，会编译失败</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>引用是变量的别名，由于右值没有地址，没法被修改，所以左值引用无法指向右值。</strong>但可以通过const左值引用指向右值。编译器将创建一个<strong>临时对象</strong>来持有这个右值，这个临时变量是可以进行取地址操作，并且在 <code>var</code> 的生命周期内，该临时对象都是有效的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">const</span> <span class="hljs-type">int</span> &amp;ref_a = <span class="hljs-number">5</span>;  <span class="hljs-comment">// 编译通过</span><br></code></pre></td></tr></table></figure>
+
+<p>const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用<code>const &amp;</code>作为函数参数的原因之一，如<code>std::vector</code>的<code>push_back</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">push_back</span> <span class="hljs-params">(<span class="hljs-type">const</span> value_type&amp; val)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>如果没有<code>const</code>，<code>vec.push_back(5)</code>这样的代码就无法编译通过了。</p>
+<h3 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h3><p>右值引用的标志是<code>&amp;&amp;</code>，顾名思义，右值引用专门为右值而生，<strong>可以指向右值，不能指向左值</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> &amp;&amp;ref_a_right = <span class="hljs-number">5</span>; <span class="hljs-comment">// ok</span><br> <br><span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br><span class="hljs-type">int</span> &amp;&amp;ref_a_left = a; <span class="hljs-comment">// 编译不过，右值引用不可以指向左值</span><br> <br>ref_a_right = <span class="hljs-number">6</span>; <span class="hljs-comment">// 右值引用的用途：可以修改右值</span><br><span class="hljs-type">int</span> &amp;&amp;ref_a_right = std::<span class="hljs-built_in">move</span>(a); <span class="hljs-comment">// 通过std::move将左值转化为右值，可以被右值引用指向</span><br></code></pre></td></tr></table></figure>
+
+<p>可以通过<code>std::move</code>函数使右值引用指向左值。</p>
+<p>在上边的代码里，看上去是左值a通过std::move移动到了右值ref_a_right中，那是不是a里边就没有值了？并不是，打印出a的值仍然是5。</p>
+<p><code>std::move</code>是一个非常有迷惑性的函数，不理解左右值概念的人们往往以为它能把一个变量里的内容移动到另一个变量，<strong>但事实上std::move移动不了什么，唯一的功能是把左值强制转化为右值</strong>，让右值引用可以指向左值。其实现等同于一个类型转换：<code>static_cast&lt;T&amp;&amp;&gt;(lvalue)</code>。 所以，<strong>单纯的std::move(xxx)不会有性能提升</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li><strong>被声明出来的左、右值引用都是左值</strong>。</li>
+<li><strong>从性能上讲，左右值引用没有区别，传参使用左右值引用都可以避免拷贝。</strong></li>
+<li><strong>右值引用可以直接指向右值，也可以通过std::move指向左值；而左值引用只能指向左值(const左值引用也能指向右值)。</strong></li>
+<li><strong>作为函数形参时，右值引用更灵活。虽然const左值引用也可以做到左右值都接受，但它无法修改，有一定局限性。</strong></li>
+</ol>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>为什么要有右值引用呢，在没有右值引用之前，一个简单的数组类通常实现如下，有<code>构造函数</code>、<code>拷贝构造函数</code>、<code>赋值运算符重载</code>、<code>析构函数</code>等。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Array</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">Array</span>(<span class="hljs-type">int</span> size) : <span class="hljs-built_in">size_</span>(size) &#123;<br>        data = <span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[size_];<br>    &#125;<br>     <br>    <span class="hljs-comment">// 深拷贝构造</span><br>    <span class="hljs-built_in">Array</span>(<span class="hljs-type">const</span> Array&amp; temp_array) &#123;<br>        size_ = temp_array.size_;<br>        data_ = <span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[size_];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; size_; i ++) &#123;<br>            data_[i] = temp_array.data_[i];<br>        &#125;<br>    &#125;<br>     <br>    <span class="hljs-comment">// 深拷贝赋值</span><br>    Array&amp; <span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> Array&amp; temp_array) &#123;<br>        <span class="hljs-keyword">delete</span>[] data_;<br> <br>        size_ = temp_array.size_;<br>        data_ = <span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[size_];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; size_; i ++) &#123;<br>            data_[i] = temp_array.data_[i];<br>        &#125;<br>    &#125;<br> <br>    ~<span class="hljs-built_in">Array</span>() &#123;<br>        <span class="hljs-keyword">delete</span>[] data_;<br>    &#125;<br> <br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-type">int</span> *data_;<br>    <span class="hljs-type">int</span> size_;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>该类的拷贝构造函数、赋值运算符重载函数已经通过使用左值引用传参来避免一次多余拷贝了，但是内部实现要深拷贝，无法避免。 这时，有人提出一个想法：是不是可以提供一个<code>移动构造函数</code>，把被拷贝者的数据移动过来，被拷贝者后边就不要了，这样就可以避免深拷贝了，如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 移动构造函数，可以浅拷贝</span><br><span class="hljs-built_in">Array</span>(<span class="hljs-type">const</span> Array&amp; temp_array, <span class="hljs-type">bool</span> move) &#123;<br>    data_ = temp_array.data_;<br>    size_ = temp_array.size_;<br>    <span class="hljs-comment">// 为防止temp_array析构时delete data，提前置空其data_</span><br>    temp_array.data_ = <span class="hljs-literal">nullptr</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这么做有2个问题：</p>
+<ul>
+<li>不优雅，表示移动语义还需要一个额外的参数(或者其他方式)。</li>
+<li>无法实现！<code>temp_array</code>是个const左值引用，无法被修改，所以<code>temp_array.data_ = nullptr;</code>这行会编译不过。当然函数参数可以改成非const：<code>Array(Array&amp; temp_array, bool move)&#123;...&#125;</code>，这样也有问题，由于左值引用不能接右值，<code>Array a = Array(Array(), true);</code>这种调用方式就没法用了。</li>
+</ul>
+<p><strong>右值引用的出现解决了这个问题</strong>，在STL的很多容器中，都实现了以<strong>右值引用为参数</strong>的<code>移动构造函数</code>和<code>移动赋值重载函数</code>，或者其他函数，最常见的如std::vector的<code>push_back</code>和<code>emplace_back</code>。参数为左值引用意味着拷贝，为右值引用意味着移动。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Array</span>(Array&amp;&amp; temp_array) &#123;<br>   data_ = temp_array.data_;<br>   size_ = temp_array.size_;<br>   <span class="hljs-comment">// 为防止temp_array析构时delete data，提前置空其data_      </span><br>   temp_array.data_ = <span class="hljs-literal">nullptr</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="移动构造函数"><a href="#移动构造函数" class="headerlink" title="移动构造函数"></a>移动构造函数</h2><p>上面我们说过，为了解决避免深拷贝的麻烦，我们引入了移动构造函数，也就是移动语义，<strong>将一个对象中的资源移动到另一个对象（资源控制权的转移）</strong>。</p>
+<p>拷贝构造函数和移动构造函数都是构造函数的重载函数，所不同的是：</p>
+<ul>
+<li>拷贝构造函数的参数是 <strong>const左值引用，接收左值或右值</strong>；</li>
+<li>移动构造函数的参数是<strong>右值引用，接收右值或被 move 的左值</strong>。</li>
+</ul>
+<p>比如书<code>vector</code>的<code>push_back</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// std::vector方法定义</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">push_back</span> <span class="hljs-params">(<span class="hljs-type">const</span> value_type&amp; val)</span></span>; <span class="hljs-comment">//可接受左值引用，左值和右值</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">push_back</span> <span class="hljs-params">(value_type&amp;&amp; val)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>当传来的参数是右值时，虽然拷贝构造函数可以接收，但是编译器会认为移动构造函数更加匹配，就会调用移动构造函数。</p>
+<p>总的来说，如果这两个函数都有在类内定义的话，在构造对象时：</p>
+<ul>
+<li>若是左值做参数，那么就会调用拷贝构造函数，做一次<strong>拷贝</strong>（如果是像 string 这样的在堆空间上存在资源的类，那么<strong>每调用一次拷贝构造就会做一次深拷贝</strong>）。</li>
+<li>若是右值做参数，那么就会调用移动构造，而调用移动构造就会<strong>减少拷贝</strong>（如果是像 string 这样的在堆空间上存在资源的类，那么<strong>每调用一次移动构造就会少做一次深拷贝</strong>）。</li>
+</ul>
+<p>比如下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">string <span class="hljs-title">s</span><span class="hljs-params">(<span class="hljs-string">&quot;Hello World11111111111111111&quot;</span>)</span></span>;<br>string s1 = s; <span class="hljs-comment">// s是左值，所以调用拷贝构造函数</span><br>string s2 = <span class="hljs-built_in">move</span>(s); <span class="hljs-comment">// s被move后变为右值，所以调用移动构造函数，s的资源会被转移用来构造s2</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="移动赋值"><a href="#移动赋值" class="headerlink" title="移动赋值"></a>移动赋值</h2><p>转移<strong>参数右值</strong>的资源来赋给自己。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//对于 std::string 来说，swap 函数会交换两个字符串对象的内部数据指针和其他相关的元数据，如字符串长度和容量。</span><br>string&amp; <span class="hljs-keyword">operator</span>=(string&amp;&amp; s)&#123;<br>　　<span class="hljs-built_in">swap</span>(s);<br>　　<span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>拷贝赋值函数和移动赋值函数都是<strong>赋值运算符重载函数的重载函数</strong>，所不同的是：</p>
+<ul>
+<li>拷贝赋值函数的参数是 <strong>const左值引用，接收左值或右值</strong>；</li>
+<li>移动赋值函数的参数是<strong>右值引用，接收右值或被 move 的左值</strong>。</li>
+</ul>
+<p>总的来说，如果这两个函数都有在类内定义的话，在进行对象的赋值时：</p>
+<ul>
+<li>若是左值做参数，那么就会调用拷贝赋值，做一次拷贝（如果是像 string 这样的在堆空间上存在资源的类，那么<strong>每调用一次拷贝赋值就会做一次深拷贝</strong>）。</li>
+<li>若是右值做参数，那么就会调用移动赋值，而调用移动赋值就会减少拷贝（如果是像 string 这样的在堆空间上存在资源的类，那么<strong>每调用一次移动赋值就会少做一次深拷贝</strong>）</li>
+</ul>
+<p>比如下面的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">string <span class="hljs-title">s</span><span class="hljs-params">(<span class="hljs-string">&quot;11111111111111111&quot;</span>)</span></span>;<br><span class="hljs-function">string <span class="hljs-title">s1</span><span class="hljs-params">(<span class="hljs-string">&quot;22222222222222222&quot;</span>)</span></span>;<br>s1 = s; <span class="hljs-comment">// s是左值，所以调用拷贝赋值函数</span><br><br><span class="hljs-function">string <span class="hljs-title">s2</span><span class="hljs-params">(<span class="hljs-string">&quot;333333333333333333&quot;</span>)</span></span>;<br>s2 = std::<span class="hljs-built_in">move</span>(s); <span class="hljs-comment">// s被move后变为右值，所以调用移动赋值函数，s的资源会被转移用来赋给s2</span><br><span class="hljs-comment">// 要注意的是，move一般是不这样用的，因为s的资源被转走了</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="unique-pointer"><a href="#unique-pointer" class="headerlink" title="unique pointer"></a>unique pointer</h2><p>理解了左值和右值，我觉得可以顺带讲一下C++里面的<code>unique_ptr</code>。</p>
+<p>还有些STL类是<code>move-only</code>的，就比如<code>unique_ptr</code>，这种类只有移动构造函数，因此只能移动(转移内部对象所有权，或者叫浅拷贝)，不能拷贝(深拷贝):</p>
+<p>所以需要</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">UniquePtr</span>(<span class="hljs-type">const</span> UniquePtr &amp;) = <span class="hljs-keyword">delete</span>;<br>UniquePtr &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> UniquePtr &amp;) = <span class="hljs-keyword">delete</span>;<br></code></pre></td></tr></table></figure>
+
+<p>需要申明移动构造函数和移动赋值函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 移动构造函数</span><br><span class="hljs-built_in">UniquePtr</span>(UniquePtr &amp;&amp;other) <span class="hljs-keyword">noexcept</span> : <span class="hljs-built_in">ptr</span>(other.ptr)<br>&#123;<br>    other.ptr = <span class="hljs-literal">nullptr</span>;<br>&#125;<br><br><span class="hljs-comment">// 移动赋值运算符</span><br>UniquePtr &amp;<span class="hljs-keyword">operator</span>=(UniquePtr &amp;&amp;other) <span class="hljs-keyword">noexcept</span><br>&#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span> != &amp;other)<br>    &#123;<br>        <span class="hljs-keyword">delete</span> ptr;      <span class="hljs-comment">// 释放当前资源</span><br>        ptr = other.ptr; <span class="hljs-comment">// 接管其他指针</span><br>        other.ptr = <span class="hljs-literal">nullptr</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这样我们就不可以写出下面的代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">up1 = up2;       <span class="hljs-comment">// 不可以，因为只有移动赋值函数，移动赋值函数需要传入一个右值，而up2显然是一个左值</span><br>up1 = <span class="hljs-built_in">UniquePtr</span>(up2); <span class="hljs-comment">// 不可以，因为只有移动构造函数，移动构造函数需要传入一个右值，而up2显然是一个左值</span><br></code></pre></td></tr></table></figure>
+
+<p>只能下面这样写(调用移动赋值函数或者移动构造函数)：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">up1 = std::<span class="hljs-built_in">move</span>(up2);  <span class="hljs-comment">//这样up2资源被移动到up1中，从而up2失效了</span><br>up1 = <span class="hljs-built_in">UniquePtr</span>(std::<span class="hljs-built_in">move</span>(pt2)); <span class="hljs-comment">//同上</span><br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="category-chain-item">C语言编程拾遗</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/C/" class="category-chain-item">C++</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/" class="print-no-link">#C语言编程拾遗</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>左值右值</div>
+      <div>http://example.com/2024/08/24/C语言编程拾遗/C++/左值右值/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>LiuZhaocheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/C++/%E4%BB%80%E4%B9%88%E6%98%AF%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/24/C%E8%AF%AD%E8%A8%80%E7%BC%96%E7%A8%8B%E6%8B%BE%E9%81%97/C++/C++%E9%9D%A2%E7%BB%8F/" title="C++面经">
+                        <span class="hidden-mobile">C++面经</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量
+        <span id="leancloud-site-pv"></span>
+        次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数
+        <span id="leancloud-site-uv"></span>
+        人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
